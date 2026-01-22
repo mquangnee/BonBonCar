@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
-namespace BonBonCarMVC.Controllers
+namespace BonBonCar.Api.Controllers
 {
     public class HomeController : Controller
     {

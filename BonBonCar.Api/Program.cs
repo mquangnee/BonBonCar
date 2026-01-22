@@ -3,7 +3,7 @@ using BonBonCar.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace BonBonCarMVC
+namespace BonBonCar.Api
 {
     public class Program
     {
