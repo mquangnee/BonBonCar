@@ -1,5 +1,7 @@
-﻿using BonBonCar.Infrastructure.Identity;
+﻿using BonBonCar.Domain.IRepository;
+using BonBonCar.Infrastructure.Identity;
 using BonBonCar.Infrastructure.Persistence;
+using BonBonCar.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,6 +40,18 @@ namespace BonBonCar.Api
                 options.Password.RequiredLength = 6; //Độ dài tối thiểu
                 options.Password.RequiredUniqueChars = 1; //Số ký tự đặc biệt
             });
+
+            // Đăng ký Repository
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
+            builder.Services.AddScoped<IRentalOrderRepository, RentalOrderRepository>();
+            builder.Services.AddScoped<IUserDocumentRepository, UserDocumentRepository>();
+            builder.Services.AddScoped<IVehicleImageRepository, VehicleImageRepository>();
+            builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+            builder.Services.AddScoped<IVerificationLogRepository, VerificationLogRepository>();
+            builder.Services.AddScoped<IVerificationSessionRepository, VerificationSessionRepository>();
 
             var app = builder.Build();
 

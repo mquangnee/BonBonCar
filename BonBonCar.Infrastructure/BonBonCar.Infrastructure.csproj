@@ -21,8 +21,4 @@
     <ProjectReference Include="..\BonBonCar.Domain\BonBonCar.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
 </Project>
