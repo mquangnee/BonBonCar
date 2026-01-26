@@ -20,6 +20,7 @@ namespace BonBonCar.Infrastructure.Persistence
         public DbSet<UserDocument> UserDocuments { get; set; }
         public DbSet<VerificationSession> VerificationSessions { get; set; }
         public DbSet<VerificationLog> VerificationLogs { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

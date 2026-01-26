@@ -2,8 +2,17 @@
 using BonBonCar.Infrastructure.Identity;
 using BonBonCar.Infrastructure.Persistence;
 using BonBonCar.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using BonBonCar.Domain.IService;
+using BonBonCar.Infrastructure.Services;
+using BonBonCar.Infrastructure.Services.Sender;
+using MediatR;
+using BonBonCar.Api.Controllers;
+using BonBonCar.Application.Commands.AuthCmd;
 
 namespace BonBonCar.Api
 {
@@ -53,6 +62,42 @@ namespace BonBonCar.Api
             builder.Services.AddScoped<IVerificationLogRepository, VerificationLogRepository>();
             builder.Services.AddScoped<IVerificationSessionRepository, VerificationSessionRepository>();
 
+            // Đăng ký Service
+            builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+            builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            builder.Services.AddScoped<IOtpService, OtpService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddMediatR(typeof(RegisterCmd).Assembly);
+
+            // Đăng ký Jwt Bearer
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                var jwt = builder.Configuration.GetSection("Jwt");
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwt["Issuer"],
+                    ValidAudience = jwt["Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!)),
+                    ClockSkew = TimeSpan.FromSeconds(30)
+                };
+            });
+
+            // Đăng ký Authorization
+            builder.Services.AddAuthorization();
+
+            // Swagger
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
             var app = builder.Build();
 
             // Seed Role
@@ -70,11 +115,18 @@ namespace BonBonCar.Api
                 app.UseHsts();
             }
 
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
