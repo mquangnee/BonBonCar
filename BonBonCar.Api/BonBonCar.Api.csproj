@@ -26,6 +26,10 @@
 
   <ItemGroup>
     <Folder Include="ViewModels\DTOs\" />
+    <Folder Include="wwwroot\images\" />
+	  <Content Include="EmailTemplates\**\*.html">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
   </ItemGroup>
 
   <ItemGroup>

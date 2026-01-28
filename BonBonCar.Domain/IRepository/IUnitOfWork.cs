@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BonBonCar.Domain.IRepository
+﻿namespace BonBonCar.Domain.IRepository
 {
     public interface IUnitOfWork : IDisposable
     {
@@ -16,6 +10,7 @@ namespace BonBonCar.Domain.IRepository
         IVehicleRepository Vehicles { get; }
         IVerificationLogRepository VerificationLogs { get; }
         IVerificationSessionRepository VerificationSessions { get; }
+        IRegisterOtpSessionRepository RegisterOtpSessions { get; }
         int SaveChanges();   
     }
 }

@@ -3,7 +3,12 @@
     public enum EnumAuthErrorCode
     {
         InvalidCredentials,    // Sai tên đăng nhập hoặc mật khẩu
-        UserNotFound  ,        // Không tìm thấy người dùng
+        RegisterSessionNotExist, // Phiên đăng ký không tồn tại
+        RegisterSessionUsed,   // Phiên đăng ký đã được sử dụng
+        OtpExpired,            // OTP đã hết hạn
+        EnterOtpTooMuch,       // Nhập OTP quá số lần cho phép
+        OtpNotValid,         // OTP không hợp lệ
+
         AccountLocked,         // Tài khoản bị khóa
         TokenExpired,          // Token hết hạn
         TokenInvalid,          // Token không hợp lệ

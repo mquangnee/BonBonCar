@@ -1,18 +1,19 @@
-﻿using BonBonCar.Domain.IRepository;
+﻿using BonBonCar.Api.Controllers;
+using BonBonCar.Application.Commands.AuthCmd;
+using BonBonCar.Domain.IRepository;
+using BonBonCar.Domain.IService;
 using BonBonCar.Infrastructure.Identity;
 using BonBonCar.Infrastructure.Persistence;
 using BonBonCar.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
-using BonBonCar.Domain.IService;
 using BonBonCar.Infrastructure.Services;
+using BonBonCar.Infrastructure.Services.Model;
 using BonBonCar.Infrastructure.Services.Sender;
 using MediatR;
-using BonBonCar.Api.Controllers;
-using BonBonCar.Application.Commands.AuthCmd;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace BonBonCar.Api
 {
@@ -61,13 +62,16 @@ namespace BonBonCar.Api
             builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
             builder.Services.AddScoped<IVerificationLogRepository, VerificationLogRepository>();
             builder.Services.AddScoped<IVerificationSessionRepository, VerificationSessionRepository>();
+            builder.Services.AddScoped<IRegisterOtpSessionRepository, RegisterOtpSessionRepository>();
 
             // Đăng ký Service
             builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
             builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             builder.Services.AddScoped<IOtpService, OtpService>();
+            builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddMediatR(typeof(RegisterCmd).Assembly);
+            builder.Services.AddScoped<IEmailTemplate, EmailTemplate>();
 
             // Đăng ký Jwt Bearer
             builder.Services.AddAuthentication(options =>

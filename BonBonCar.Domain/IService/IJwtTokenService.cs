@@ -2,6 +2,6 @@
 {
     public interface IJwtTokenService
     {
-        string CreateAccessToken(Guid userId, string email, IEnumerable<string> roles);
+        string CreateAccessToken(Guid userId, string? userName, string email, string role);
     }
 }

@@ -21,6 +21,7 @@ namespace BonBonCar.Infrastructure.Persistence
         public DbSet<VerificationSession> VerificationSessions { get; set; }
         public DbSet<VerificationLog> VerificationLogs { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<RegisterOtpSession> RegisterOtpSessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

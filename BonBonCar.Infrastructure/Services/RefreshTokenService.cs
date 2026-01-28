@@ -55,7 +55,7 @@ namespace BonBonCar.Infrastructure.Services
                 TokenHash = hash,
                 ExpiresAt = DateTime.Now.AddDays(7)
             };
-            _dbContext.RefreshTokens.Add(token);
+            await _dbContext.RefreshTokens.AddAsync(token);
             await _dbContext.SaveChangesAsync();
         }
     }
