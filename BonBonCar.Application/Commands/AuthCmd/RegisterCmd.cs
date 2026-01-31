@@ -71,6 +71,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
             var session = new RegisterOtpSession
             {
                 Email = request.Email,
+                Username = request.UserName,
                 PasswordHash = passwordHash,
                 OtpHash = otpHash,
                 ExpiredAt = DateTime.UtcNow.AddMinutes(5),
@@ -92,7 +93,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
             _ = Task.Run(() => _emailService.SendEmailAsync(request.Email, "BonBonCar Registration OTP", body));
             var registeStartResultModel = new RegisterStartResultModel
             {
-                RegisterSessionID = session.Id,
+                RegisterSessionId = session.Id,
                 ExpiresInSeconds = 5 * 60, // Hiển thị thời gian hết hạn
                 MaskedEmail = MaskEmail(request.Email) // Hiển thị email đã được che mờ
             };

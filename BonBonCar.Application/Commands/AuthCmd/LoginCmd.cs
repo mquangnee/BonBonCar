@@ -1,7 +1,7 @@
 ﻿using BonBonCar.Application.Common;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IService;
-using BonBonCar.Domain.Models.CmdModels;
+using BonBonCar.Domain.Models.CmdModels.AuthCmdModels;
 using BonBonCar.Domain.Models.EntityModels;
 using BonBonCar.Infrastructure.Identity;
 using MediatR;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BonBonCar.Domain.Models.CmdModels
+namespace BonBonCar.Domain.Models.CmdModels.AuthCmdModels
 {
     public class LoginCmdModel
     {

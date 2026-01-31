@@ -21,6 +21,7 @@ namespace BonBonCar.Infrastructure.Repositories
         public IVerificationLogRepository VerificationLogs { get; private set; }
 
         public IVerificationSessionRepository VerificationSessions { get; private set; }
+
         public IRegisterOtpSessionRepository RegisterOtpSessions { get; private set; }
 
         public UnitOfWork(DataContext dbContext)

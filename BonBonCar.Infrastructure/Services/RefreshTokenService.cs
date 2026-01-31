@@ -22,6 +22,16 @@ namespace BonBonCar.Infrastructure.Services
             return token;
         }
 
+        public async Task<RefreshToken?> GetByUserIdAsync(Guid userId)
+        {
+            var token = await _dbContext.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);
+            if (token == null)
+            {
+                return null;
+            }
+            return token;
+        }
+
         public async Task<string> IssueAsync(Guid userId)
         {
             var refreshToken = TokenUtil.GenerateRefeshToken();

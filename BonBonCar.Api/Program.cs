@@ -20,7 +20,7 @@ namespace BonBonCar.Api
     public class Program
     {
         public static async Task Main(string[] args)
-        {
+      {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
