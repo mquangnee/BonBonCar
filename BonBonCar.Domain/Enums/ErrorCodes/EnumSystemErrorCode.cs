@@ -10,6 +10,7 @@
         DataNotExist,
         DataAlreadyExist,
         ImportFileRequired,
-        InValidFormat
+        InValidFormat,
+        Unauthorized
     }
 }

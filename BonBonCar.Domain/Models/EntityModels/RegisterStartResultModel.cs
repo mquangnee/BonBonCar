@@ -2,7 +2,7 @@
 {
     public class RegisterStartResultModel
     {
-        public Guid RegisterSessionID { get; set; }
+        public Guid RegisterSessionId { get; set; }
         public int ExpiresInSeconds { get; set; }
         public string MaskedEmail { get; set; } = default!;
     }

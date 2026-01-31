@@ -8,7 +8,7 @@
         OtpExpired,            // OTP đã hết hạn
         EnterOtpTooMuch,       // Nhập OTP quá số lần cho phép
         OtpNotValid,         // OTP không hợp lệ
-
+        ChangePasswordFailed,  // Đổi mật khẩu thất bại
         AccountLocked,         // Tài khoản bị khóa
         TokenExpired,          // Token hết hạn
         TokenInvalid,          // Token không hợp lệ

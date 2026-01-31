@@ -8,5 +8,6 @@ namespace BonBonCar.Domain.IService
         Task SaveAsync(Guid userId, string refreshToken);
         Task<RefreshToken?> GetByTokenAsync(string refreshToken);
         Task RevokeAsync(string refreshToken);
+        Task<RefreshToken> GetByUserIdAsync(Guid userId);
     }
 }

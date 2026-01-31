@@ -2,8 +2,10 @@
 using BonBonCar.Application.Common;
 using BonBonCar.Domain.Models.EntityModels;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 
 namespace BonBonCar.Api.Controllers
 {
@@ -67,6 +69,63 @@ namespace BonBonCar.Api.Controllers
         {
             var commandResult = await _mediator.Send(command).ConfigureAwait(false);
             return commandResult.GetActionResult();
+        }
+
+        /// <summary>
+        /// Đăng xuất người dùng
+        /// Route: /api/auth/logout
+        /// Method: POST
+        /// </summary>
+        /// <param name="command"></param>
+        /// Dữ liệu đăng xuất người dùng: refresh token
+        /// <returns></returns>
+        [HttpPost("logout")]
+        [Authorize]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+            var result = await _mediator.Send(new LogoutCmd { UserID = Guid.Parse(userId) }).ConfigureAwait(false);
+            return result.GetActionResult();
+        }
+
+        /// <summary>
+        /// Quên mật khẩu - Yêu cầu đặt lại mật khẩu
+        /// Route: /api/auth/forgot-password
+        /// Method: POST
+        /// </summary>
+        /// <param name="command"></param>
+        /// Dữ liệu yêu cầu đặt lại mật khẩu: email
+        /// <returns></returns>
+        [HttpPost("forgot-password")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCmd command)
+        {
+            var result = await _mediator.Send(command).ConfigureAwait(false);
+            return result.GetActionResult();
+        }
+
+        /// <summary>
+        /// Đặt lại mật khẩu
+        /// Route: /api/auth/reset-password
+        /// Method: POST
+        /// </summary>
+        /// <param name="command"></param>
+        /// Dữ liệu đặt lại mật khẩu: email, mã OTP, mật khẩu mới, xác nhận mật khẩu mới
+        /// <returns></returns>
+        [HttpPost("reset-password")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCmd command)
+        {
+            var result = await _mediator.Send(command).ConfigureAwait(false);
+            return result.GetActionResult();
         }
     }
 }

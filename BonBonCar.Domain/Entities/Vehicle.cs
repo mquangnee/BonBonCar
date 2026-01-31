@@ -28,6 +28,6 @@ namespace BonBonCar.Domain.Entities
         [Required]
         public EnumVehicleStatus Status { get; set; } = EnumVehicleStatus.Inactive;
         [Required]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

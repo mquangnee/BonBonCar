@@ -2,7 +2,7 @@
 {
     public class VerifyRegisterOtpCmdModel
     {
-        public Guid SessionId { get; set; }
+        public string SessionId { get; set; } = default!;
         public string Otp { get; set; } = default!;
     }
 }

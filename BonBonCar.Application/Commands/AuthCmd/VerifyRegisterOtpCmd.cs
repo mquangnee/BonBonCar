@@ -35,7 +35,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
         {
             ArgumentNullException.ThrowIfNull(request);
             var methodResult = new MethodResult<AuthModel>();
-            var session = await _unitOfWork.RegisterOtpSessions.GetByIdAsync(request.SessionId);
+            var session = await _unitOfWork.RegisterOtpSessions.GetByIdAsync(Guid.Parse(request.SessionId));
             // Validate session
             if (session == null)
             {
@@ -81,6 +81,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
             user = new ApplicationUser
             {
                 UserName = session.Email,
+                FullName = session.Username,
                 Email = session.Email,
                 PasswordHash = session.PasswordHash,
                 IsVerified = false,
