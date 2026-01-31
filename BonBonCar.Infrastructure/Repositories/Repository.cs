@@ -12,9 +12,9 @@ namespace BonBonCar.Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        public T Add(T newEntity)
+        public async Task<T> AddAsync(T newEntity)
         {
-            _dbContext.Set<T>().Add(newEntity);
+            await _dbContext.Set<T>().AddAsync(newEntity);
             return newEntity;
         }
 
@@ -24,13 +24,13 @@ namespace BonBonCar.Infrastructure.Repositories
             return entity != null ? true : false;
         }
 
-        public async Task<bool> DeleteAsync(T deleteEntity)
+        public bool DeleteAsync(T deleteEntity)
         {
             var entity = _dbContext.Set<T>().Remove(deleteEntity);
             return entity != null ? true : false;
         }
 
-        public async Task<T> GetByIdAsync(Guid id)
+        public async Task<T?> GetByIdAsync(Guid id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }

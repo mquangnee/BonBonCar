@@ -6,7 +6,7 @@ namespace BonBonCar.Domain.Entities
     public class UserDocument
     {
         [Key]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         [Required]
         public Guid UserId { get; set; }
         [Required]

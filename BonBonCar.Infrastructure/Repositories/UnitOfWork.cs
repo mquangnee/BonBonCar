@@ -21,6 +21,7 @@ namespace BonBonCar.Infrastructure.Repositories
         public IVerificationLogRepository VerificationLogs { get; private set; }
 
         public IVerificationSessionRepository VerificationSessions { get; private set; }
+        public IRegisterOtpSessionRepository RegisterOtpSessions { get; private set; }
 
         public UnitOfWork(DataContext dbContext)
         {
@@ -33,6 +34,7 @@ namespace BonBonCar.Infrastructure.Repositories
             Vehicles = new VehicleRepository(_dbContext);
             VerificationLogs = new VerificationLogRepository(_dbContext);
             VerificationSessions = new VerificationSessionRepository(_dbContext);
+            RegisterOtpSessions = new RegisterOtpSessionRepository(_dbContext);
         }
 
         public void Dispose()
