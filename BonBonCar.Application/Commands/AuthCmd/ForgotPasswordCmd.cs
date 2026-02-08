@@ -1,8 +1,8 @@
 ﻿using BonBonCar.Application.Common;
+using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IService;
 using BonBonCar.Domain.Models.CmdModels.AuthCmdModels;
-using BonBonCar.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -15,12 +15,12 @@ namespace BonBonCar.Application.Commands.AuthCmd
 
     public class ForgotPasswordCmdHandler : IRequestHandler<ForgotPasswordCmd, MethodResult<bool>>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly IOtpService _otpService;
         private readonly IEmailService _emailService;
         private readonly IEmailTemplate _emailTemplate;
 
-        public ForgotPasswordCmdHandler(UserManager<ApplicationUser> userManager, IOtpService otpService, IEmailService emailService, IEmailTemplate emailTemplate)
+        public ForgotPasswordCmdHandler(UserManager<User> userManager, IOtpService otpService, IEmailService emailService, IEmailTemplate emailTemplate)
         {
             _userManager = userManager;
             _otpService = otpService;

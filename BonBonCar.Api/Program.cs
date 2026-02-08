@@ -1,9 +1,11 @@
-﻿using BonBonCar.Api.Controllers;
-using BonBonCar.Application.Commands.AuthCmd;
+﻿using BonBonCar.Application.Commands.AuthCmd;
+using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.IRepository;
 using BonBonCar.Domain.IService;
 using BonBonCar.Infrastructure.Identity;
+using BonBonCar.Infrastructure.Maps;
 using BonBonCar.Infrastructure.Persistence;
+using BonBonCar.Infrastructure.Persistence.SeedData;
 using BonBonCar.Infrastructure.Repositories;
 using BonBonCar.Infrastructure.Services;
 using BonBonCar.Infrastructure.Services.Model;
@@ -33,7 +35,7 @@ namespace BonBonCar.Api
             });
 
             // Đăng ký Identity
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+            builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
             })
@@ -58,8 +60,8 @@ namespace BonBonCar.Api
             builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
             builder.Services.AddScoped<IRentalOrderRepository, RentalOrderRepository>();
             builder.Services.AddScoped<IUserDocumentRepository, UserDocumentRepository>();
-            builder.Services.AddScoped<IVehicleImageRepository, VehicleImageRepository>();
-            builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+            builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
+            builder.Services.AddScoped<ICarRepository, CarRepository>();
             builder.Services.AddScoped<IVerificationLogRepository, VerificationLogRepository>();
             builder.Services.AddScoped<IVerificationSessionRepository, VerificationSessionRepository>();
             builder.Services.AddScoped<IRegisterOtpSessionRepository, RegisterOtpSessionRepository>();
@@ -95,6 +97,9 @@ namespace BonBonCar.Api
                 };
             });
 
+            // Đăng ký Auto Mapper
+            builder.Services.AddAutoMapper(typeof(BasePriceProfile).Assembly);
+
             // Đăng ký Authorization
             builder.Services.AddAuthorization();
 
@@ -104,7 +109,15 @@ namespace BonBonCar.Api
 
             var app = builder.Build();
 
-            // Seed Role
+            // Seed Data
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+                await SeedBasePrice.SeedAsync(db);
+                await SeedBrand.SeedAsync(db);
+                await SeedModel.SeedAsync(db);
+            }
+
             using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();

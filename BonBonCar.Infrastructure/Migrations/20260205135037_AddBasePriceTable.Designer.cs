@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BonBonCar.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260131131002_InitialDb")]
-    partial class InitialDb
+    [Migration("20260205135037_AddBasePriceTable")]
+    partial class AddBasePriceTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,156 @@ namespace BonBonCar.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.BasePrices", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("BasePrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("RentalDuration")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VehicleType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BasePrices");
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.Brand", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Brands");
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.Car", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LicensePlate")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid>("ModelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cars");
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.CarImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VehicleId", "IsPrimary")
+                        .IsUnique()
+                        .HasFilter("[IsPrimary] = 1");
+
+                    b.ToTable("CarImages");
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.CarPrice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RentalDuration")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarPrices");
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.Model", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BrandId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("VehicleType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BrandId");
+
+                    b.ToTable("Models");
+                });
 
             modelBuilder.Entity("BonBonCar.Domain.Entities.Payment", b =>
                 {
@@ -200,185 +350,7 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.ToTable("RentalOrders");
                 });
 
-            modelBuilder.Entity("BonBonCar.Domain.Entities.UserDocument", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BackImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateOnly>("DateOfBirth")
-                        .HasColumnType("date");
-
-                    b.Property<string>("DocumentNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("DocumentType")
-                        .HasColumnType("int");
-
-                    b.Property<DateOnly>("ExpiredDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("FrontImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateOnly>("IssuedDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserDocuments");
-                });
-
-            modelBuilder.Entity("BonBonCar.Domain.Entities.Vehicle", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Brand")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LicensePlate")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Model")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<Guid>("OwnerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("PricePerDay")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Vehicles");
-                });
-
-            modelBuilder.Entity("BonBonCar.Domain.Entities.VehicleImage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VehicleId", "IsPrimary")
-                        .IsUnique()
-                        .HasFilter("[IsPrimary] = 1");
-
-                    b.ToTable("VehicleImages");
-                });
-
-            modelBuilder.Entity("BonBonCar.Domain.Entities.VerificationLog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsPassed")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MatchScore")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Step")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("VerificationSessionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VerificationSessionId");
-
-                    b.ToTable("VerificationLogs");
-                });
-
-            modelBuilder.Entity("BonBonCar.Domain.Entities.VerificationSession", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OverallStatus")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("VerificationType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("VerificationSessions");
-                });
-
-            modelBuilder.Entity("BonBonCar.Infrastructure.Identity.ApplicationUser", b =>
+            modelBuilder.Entity("BonBonCar.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -461,7 +433,118 @@ namespace BonBonCar.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.UserDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BackImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateOnly>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("DocumentType")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("ExpiredDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("FrontImageUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateOnly>("IssuedDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserDocuments");
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.VerificationLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsPassed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MatchScore")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Step")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("VerificationSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VerificationSessionId");
+
+                    b.ToTable("VerificationLogs");
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.VerificationSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OverallStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("VerificationType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("VerificationSessions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
@@ -489,7 +572,7 @@ namespace BonBonCar.Infrastructure.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -513,7 +596,7 @@ namespace BonBonCar.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaims", (string)null);
+                    b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -537,7 +620,7 @@ namespace BonBonCar.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaims", (string)null);
+                    b.ToTable("AspNetUserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
@@ -558,7 +641,7 @@ namespace BonBonCar.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogins", (string)null);
+                    b.ToTable("AspNetUserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
@@ -573,7 +656,7 @@ namespace BonBonCar.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles", (string)null);
+                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -592,7 +675,18 @@ namespace BonBonCar.Infrastructure.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserTokens", (string)null);
+                    b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.Model", b =>
+                {
+                    b.HasOne("BonBonCar.Domain.Entities.Brand", "Brand")
+                        .WithMany("Models")
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brand");
                 });
 
             modelBuilder.Entity("BonBonCar.Domain.Entities.Payment", b =>
@@ -619,7 +713,7 @@ namespace BonBonCar.Infrastructure.Migrations
 
             modelBuilder.Entity("BonBonCar.Domain.Entities.RentalOrder", b =>
                 {
-                    b.HasOne("BonBonCar.Domain.Entities.Vehicle", "Vehicle")
+                    b.HasOne("BonBonCar.Domain.Entities.Car", "Vehicle")
                         .WithMany()
                         .HasForeignKey("VehicleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -648,7 +742,7 @@ namespace BonBonCar.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("BonBonCar.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("BonBonCar.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -657,7 +751,7 @@ namespace BonBonCar.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("BonBonCar.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("BonBonCar.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -672,7 +766,7 @@ namespace BonBonCar.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BonBonCar.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("BonBonCar.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -681,11 +775,16 @@ namespace BonBonCar.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("BonBonCar.Infrastructure.Identity.ApplicationUser", null)
+                    b.HasOne("BonBonCar.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BonBonCar.Domain.Entities.Brand", b =>
+                {
+                    b.Navigation("Models");
                 });
 
             modelBuilder.Entity("BonBonCar.Domain.Entities.RentalOrder", b =>

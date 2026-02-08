@@ -3,8 +3,8 @@ using BonBonCar.Domain.Models.EntityModels;
 
 namespace BonBonCar.Domain.IRepository
 {
-    public interface IVehicleRepository : IRepository<Vehicle>
+    public interface ICarRepository : IRepository<Car>
     {
-        Task<Vehicle> GetByLicensePlate(string licensePlateId);
+        Task<Car> GetByLicensePlate(string licensePlateId);
     }
 }

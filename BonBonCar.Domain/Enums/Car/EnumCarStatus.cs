@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace BonBonCar.Domain.Enums.Vehicle
+namespace BonBonCar.Domain.Enums.Car
 {
-    public enum EnumVehicleStatus
+    public enum EnumCarStatus
     {
         [Description("Không hoạt động")]
         Inactive = 0,

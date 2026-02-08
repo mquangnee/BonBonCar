@@ -1,9 +1,9 @@
 ﻿using BonBonCar.Application.Common;
+using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IService;
 using BonBonCar.Domain.Models.CmdModels.AuthCmdModels;
 using BonBonCar.Domain.Models.EntityModels;
-using BonBonCar.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -16,12 +16,12 @@ namespace BonBonCar.Application.Commands.AuthCmd
 
     public class LoginCmdHandler : IRequestHandler<LoginCmd, MethodResult<AuthModel>>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
 
-        public LoginCmdHandler(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService)
+        public LoginCmdHandler(UserManager<User> userManager, SignInManager<User> signInManager, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService)
         {
             _userManager = userManager;
             _signInManager = signInManager;

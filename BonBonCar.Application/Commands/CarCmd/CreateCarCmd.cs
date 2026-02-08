@@ -2,18 +2,18 @@
 using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IRepository;
-using BonBonCar.Domain.Models.CmdModels.ManageVehicleCmdModels;
+using BonBonCar.Domain.Models.CmdModels.CarCmdModels;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
-namespace BonBonCar.Application.Commands.ManageVehicleCmdD
+namespace BonBonCar.Application.Commands.CarCmd
 {
-    public class CreateVehicleCmd : CreateVehicleCmdModel, IRequest<MethodResult<CreateVehicleCmdModel>>
+    public class CreateCarCmd : CreateCarCmdModel, IRequest<MethodResult<CreateCarCmdModel>>
     {
     }
 
-    public class CreateVehicleCmdHandler : IRequestHandler<CreateVehicleCmd, MethodResult<CreateVehicleCmdModel>>
+    public class CreateVehicleCmdHandler : IRequestHandler<CreateCarCmd, MethodResult<CreateCarCmdModel>>
     {   
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -24,10 +24,11 @@ namespace BonBonCar.Application.Commands.ManageVehicleCmdD
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<MethodResult<CreateVehicleCmdModel>> Handle(CreateVehicleCmd request, CancellationToken cancellationToken)
+        public async Task<MethodResult<CreateCarCmdModel>> Handle(CreateCarCmd request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request);
-            var methodResult = new MethodResult<CreateVehicleCmdModel>();
+            var methodResult = new MethodResult<CreateCarCmdModel>();
+        
             //var vehicle = await _unitOfWork.Vehicles.GetByLicensePlate(request.LicensePlate ?? string.Empty);
             //if (!Guid.TryParse(_httpContextAccessor?.HttpContext?.User.FindFirstValue("sub"), out var userId))
             //{

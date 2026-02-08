@@ -2,7 +2,7 @@
 
 namespace BonBonCar.Domain.IRepository
 {
-    public interface IVehicleImageRepository : IRepository<VehicleImage>
+    public interface ICarImageRepository : IRepository<CarImage>
     {
     }
 }

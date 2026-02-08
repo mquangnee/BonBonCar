@@ -1,21 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BonBonCar.Domain.Enums.Vehicle;
+using BonBonCar.Domain.Enums.Car;
 
 namespace BonBonCar.Domain.Entities
 {
-    public class Vehicle
+    public class Car
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
         [Required]
-        public Guid OwnerId { get; set; }
+        public Guid UserId { get; set; }
         [Required]
-        [StringLength(50)]
-        public string? Brand { get; set; }
-        [Required]
-        [StringLength(50)]
-        public string? Model { get; set; }
+        public Guid ModelId { get; set; }
         [Required]
         [Range(1900, 2100)]
         public int Year { get; set; }
@@ -23,10 +19,7 @@ namespace BonBonCar.Domain.Entities
         [StringLength(20)]
         public string? LicensePlate { get; set; }
         [Required]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal PricePerDay { get; set; }
-        [Required]
-        public EnumVehicleStatus Status { get; set; } = EnumVehicleStatus.Inactive;
+        public EnumCarStatus Status { get; set; } = EnumCarStatus.Inactive;
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

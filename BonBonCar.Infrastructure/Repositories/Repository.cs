@@ -1,5 +1,6 @@
 ﻿using BonBonCar.Domain.IRepository;
 using BonBonCar.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace BonBonCar.Infrastructure.Repositories
 {
@@ -28,6 +29,11 @@ namespace BonBonCar.Infrastructure.Repositories
         {
             var entity = _dbContext.Set<T>().Remove(deleteEntity);
             return entity != null ? true : false;
+        }
+
+        public async Task<IList<T>> GetAllAsync()
+        {
+            return await _dbContext.Set<T>().ToListAsync();
         }
 
         public async Task<T?> GetByIdAsync(Guid id)

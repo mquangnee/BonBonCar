@@ -2,7 +2,7 @@
 
 namespace BonBonCar.Domain.Entities
 {
-    public class VehicleImage
+    public class CarImage
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();

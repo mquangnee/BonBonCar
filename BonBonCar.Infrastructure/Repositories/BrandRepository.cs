@@ -4,9 +4,9 @@ using BonBonCar.Infrastructure.Persistence;
 
 namespace BonBonCar.Infrastructure.Repositories
 {
-    public class VehicleImageRepository : Repository<VehicleImage>, IVehicleImageRepository
+    public class BrandRepository : Repository<Brand>, IBrandRepository
     {
-        public VehicleImageRepository(DataContext dbContext) : base(dbContext)
+        public BrandRepository(DataContext dbContext) : base(dbContext)
         {
         }
     }

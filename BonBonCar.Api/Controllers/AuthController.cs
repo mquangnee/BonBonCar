@@ -25,8 +25,7 @@ namespace BonBonCar.Api.Controllers
         /// Route: /api/auth/register
         /// Method: POST
         /// </summary>
-        /// <param name="command">
-        /// Dữ liệu đăng ký người dùng: email, mật khẩu, xác nhận mật khẩu
+        /// <param name="command"> Dữ liệu đăng ký người dùng: email, mật khẩu, xác nhận mật khẩu
         /// </param>
         [HttpPost("register")]
         [ProducesResponseType(typeof(MethodResult<RegisterStartResultModel>), (int)HttpStatusCode.OK)]
@@ -42,8 +41,7 @@ namespace BonBonCar.Api.Controllers
         /// Route: /api/auth/register/verify-otp
         /// Method: POST
         /// </summary>
-        /// <param name="command"><
-        /// Dữ liệu xác thực OTP: email, mã OTP
+        /// <param name="command">< Dữ liệu xác thực OTP: email, mã OTP
         /// /param>
         [HttpPost("register/verify-otp")]
         [ProducesResponseType(typeof(MethodResult<AuthModel>), (int)HttpStatusCode.Created)]
@@ -59,8 +57,7 @@ namespace BonBonCar.Api.Controllers
         /// Route: /api/auth/login
         /// Method: POST
         /// </summary>
-        /// <param name="command">
-        /// Dữ liệu đăng nhập người dùng: email, mật khẩu
+        /// <param name="command"> Dữ liệu đăng nhập người dùng: email, mật khẩu
         /// </param>
         [HttpPost("login")]
         [ProducesResponseType(typeof(MethodResult<AuthModel>), (int)HttpStatusCode.OK)]
@@ -76,8 +73,7 @@ namespace BonBonCar.Api.Controllers
         /// Route: /api/auth/logout
         /// Method: POST
         /// </summary>
-        /// <param name="command"></param>
-        /// Dữ liệu đăng xuất người dùng: refresh token
+        /// <param name="command"></param> Dữ liệu đăng xuất người dùng: refresh token
         /// <returns></returns>
         [HttpPost("logout")]
         [Authorize]
@@ -99,8 +95,7 @@ namespace BonBonCar.Api.Controllers
         /// Route: /api/auth/forgot-password
         /// Method: POST
         /// </summary>
-        /// <param name="command"></param>
-        /// Dữ liệu yêu cầu đặt lại mật khẩu: email
+        /// <param name="command"></param> Dữ liệu yêu cầu đặt lại mật khẩu: email
         /// <returns></returns>
         [HttpPost("forgot-password")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
@@ -116,8 +111,7 @@ namespace BonBonCar.Api.Controllers
         /// Route: /api/auth/reset-password
         /// Method: POST
         /// </summary>
-        /// <param name="command"></param>
-        /// Dữ liệu đặt lại mật khẩu: email, mã OTP, mật khẩu mới, xác nhận mật khẩu mới
+        /// <param name="command"></param> Dữ liệu đặt lại mật khẩu: email, mã OTP, mật khẩu mới, xác nhận mật khẩu mới
         /// <returns></returns>
         [HttpPost("reset-password")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]

@@ -6,15 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BonBonCar.Infrastructure.Repositories
 {
-    public class VehicleRepository : Repository<Vehicle>, IVehicleRepository
+    public class CarRepository : Repository<Car>, ICarRepository
     {
-        public VehicleRepository(DataContext dbContext) : base(dbContext)
+        public CarRepository(DataContext dbContext) : base(dbContext)
         {
         }
 
-        public async Task<Vehicle> GetByLicensePlate(string licensePlateId)
+        public async Task<Car> GetByLicensePlate(string licensePlateId)
         {
-            var vehicle = await _dbContext.Vehicles.FirstOrDefaultAsync(v => v.LicensePlate == licensePlateId);
+            var vehicle = await _dbContext.Cars.FirstOrDefaultAsync(v => v.LicensePlate == licensePlateId);
             if (vehicle == null)
             {
                 return null;
