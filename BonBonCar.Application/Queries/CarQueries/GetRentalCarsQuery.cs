@@ -63,6 +63,7 @@ namespace BonBonCar.Application.Queries.CarQueries
                     return methodResult;
                 }
                 var thumbnailImage = await _unitOfWork.VehicleImages.QueryableAsync().FirstOrDefaultAsync(i => i.VehicleId == car.Id && i.IsPrimary == true);
+                var thumbnailImageUrl = thumbnailImage != null ? thumbnailImage.ImageUrl : "";
                 //if (thumbnailImage == null)
                 //{
                 //    methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist));
@@ -74,7 +75,7 @@ namespace BonBonCar.Application.Queries.CarQueries
                     ModelName = model.Name,
                     Year = car.Year,
                     LicensePlate = car.LicensePlate,
-                    ThumbnailUrl = "abc",
+                    ThumbnailUrl = thumbnailImageUrl,
                     Status = car.Status
                 };
                 rentalCarsList.Add(rentalCar);

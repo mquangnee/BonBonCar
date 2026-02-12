@@ -1,4 +1,4 @@
-﻿using BonBonCar.Domain.Enums.Car;
+using BonBonCar.Domain.Enums.Car;
 using System.ComponentModel.DataAnnotations;
 
 namespace BonBonCar.Domain.Entities
@@ -17,6 +17,11 @@ namespace BonBonCar.Domain.Entities
         [Required]
         [StringLength(20)]
         public string? LicensePlate { get; set; }
+        /// <summary>
+        /// Car location for search/filter (e.g. city/district/address).
+        /// </summary>
+        [StringLength(10)]
+        public string? Location { get; set; }
         [Required]
         public IList<string>? Features { get; set; }
         [Required]

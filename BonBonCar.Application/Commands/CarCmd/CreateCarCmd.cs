@@ -1,4 +1,4 @@
-﻿using BonBonCar.Application.Common;
+using BonBonCar.Application.Common;
 using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IRepository;
@@ -59,6 +59,7 @@ namespace BonBonCar.Application.Commands.CarCmd
                 ModelId = request.ModelId,
                 Year = request.Year,
                 LicensePlate =request.LicensePlate?.Trim(),
+                Location = request.Location?.Trim(),
                 Features = request.Features
             };
             await _unitOfWork.Vehicles.AddAsync(car);
