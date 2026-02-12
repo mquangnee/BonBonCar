@@ -14,6 +14,7 @@
         IBrandRepository Brands { get; }
         IModelRepository Models { get; }
         IBasePriceRepository BasePrices { get; }
+        ICarPriceRepository CarPrices { get; }
         int SaveChanges();   
     }
 }

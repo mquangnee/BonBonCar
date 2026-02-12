@@ -1,14 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace BonBonCar.Domain.Models.CmdModels.CarCmdModels
 {
     public class CreateCarCmdModel
     {
-        [Required]
-        [Range(1900, 2100)]
+        public Guid ModelId { get; set; }
         public int Year { get; set; }
-        [Required]
-        [StringLength(20)]
         public string? LicensePlate { get; set; }
+        public IList<string>? Features { get; set; }
+        public IList<IFormFile>? Images { get; set; }
+        public string? Prices { get; set; }
     }
 }

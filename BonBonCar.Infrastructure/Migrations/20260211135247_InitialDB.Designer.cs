@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BonBonCar.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260205135037_AddBasePriceTable")]
-    partial class AddBasePriceTable
+    [Migration("20260211135247_InitialDB")]
+    partial class InitialDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,6 +74,10 @@ namespace BonBonCar.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Features")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LicensePlate")
                         .IsRequired()

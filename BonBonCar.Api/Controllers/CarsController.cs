@@ -1,6 +1,8 @@
-﻿using BonBonCar.Application.Common;
+﻿using BonBonCar.Application.Commands.CarCmd;
+using BonBonCar.Application.Common;
 using BonBonCar.Application.Queries.BasePriceQuery;
 using BonBonCar.Application.Queries.BrandQuery;
+using BonBonCar.Application.Queries.CarQueries;
 using BonBonCar.Application.Queries.ModelQuery;
 using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.Car;
@@ -22,6 +24,17 @@ namespace BonBonCar.Api.Controllers
         public CarsController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+
+        // Lấy danh sách xe sẵn sàng cho thuê
+        [HttpGet()]
+        [ProducesResponseType(typeof(MethodResult<IList<Car>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetCarsAvailable()
+        {
+            var query = new GetAvailableCarsQuery { };
+            var commandResult = await _mediator.Send(query).ConfigureAwait(false);
+            return commandResult.GetActionResult();
         }
 
         /// <summary>
@@ -64,6 +77,30 @@ namespace BonBonCar.Api.Controllers
         public async Task<IActionResult> GetBasePrice([FromRoute] EnumCarType carType)
         {
             var commandResult = await _mediator.Send(new GetBasePriceQuery { CarType = carType }).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        /// <summary>
+        /// Upload xe cho thuê
+        /// Route: /api/cars/upload-rental-car
+        /// Method: POST
+        /// </summary>
+        [HttpPost("upload-rental-car")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> UploadRentalCar([FromForm] CreateCarCmd command)
+        {
+            var commandResult = await _mediator.Send(command).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        [HttpGet("get-rental-cars")]
+        [ProducesResponseType(typeof(MethodResult<IList<RentalCarModel>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetRentalCars([FromQuery] GetRentalCarsQuery query)
+        {
+            var commandResult = await _mediator.Send(query).ConfigureAwait(false);
             return commandResult.GetActionResult();
         }
     }

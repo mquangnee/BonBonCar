@@ -41,6 +41,11 @@ namespace BonBonCar.Infrastructure.Repositories
             return await _dbContext.Set<T>().FindAsync(id);
         }
 
+        public IQueryable<T> QueryableAsync()
+        {
+            return _dbContext.Set<T>().AsQueryable();
+        }
+
         public T Update(T updateEntity)
         {
             _dbContext.Update(updateEntity);

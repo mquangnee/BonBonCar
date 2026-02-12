@@ -70,6 +70,7 @@ namespace BonBonCar.Api
             builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
             builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
             builder.Services.AddScoped<IOtpService, OtpService>();
+            builder.Services.AddScoped<IFileStorage, LocalFileStorage>();
             builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSettings"));
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddMediatR(typeof(RegisterCmd).Assembly);

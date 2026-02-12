@@ -7,7 +7,7 @@ namespace BonBonCar.Domain.Entities
     public class CarPrice
     {
         [Key]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public Guid CarId { get; set; }
         public EnumRentalDuration RentalDuration { get; set; }
         [Required]

@@ -8,5 +8,6 @@
         Task<T?> GetByIdAsync(Guid id);
         Task<bool> AnyAsync(Guid id);
         Task<IList<T>> GetAllAsync();
+        IQueryable<T> QueryableAsync();
     }
 }

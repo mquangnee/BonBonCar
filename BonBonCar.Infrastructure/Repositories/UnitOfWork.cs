@@ -1,4 +1,5 @@
-﻿using BonBonCar.Domain.IRepository;
+﻿using BonBonCar.Domain.Entities;
+using BonBonCar.Domain.IRepository;
 using BonBonCar.Infrastructure.Persistence;
 
 namespace BonBonCar.Infrastructure.Repositories
@@ -30,6 +31,8 @@ namespace BonBonCar.Infrastructure.Repositories
         
         public IBasePriceRepository BasePrices { get; private set; }
 
+        public ICarPriceRepository CarPrices { get; private set; }
+
         public UnitOfWork(DataContext dbContext)
         {
             _dbContext = dbContext;
@@ -45,6 +48,7 @@ namespace BonBonCar.Infrastructure.Repositories
             Brands = new BrandRepository(_dbContext);
             Models = new ModelRepository(_dbContext);
             BasePrices = new BasePriceRepository(_dbContext);
+            CarPrices = new CarPriceRepository(_dbContext);
         }
 
         public void Dispose()

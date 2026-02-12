@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using BonBonCar.Domain.Enums.Car;
+﻿using BonBonCar.Domain.Enums.Car;
+using System.ComponentModel.DataAnnotations;
 
 namespace BonBonCar.Domain.Entities
 {
@@ -18,6 +17,8 @@ namespace BonBonCar.Domain.Entities
         [Required]
         [StringLength(20)]
         public string? LicensePlate { get; set; }
+        [Required]
+        public IList<string>? Features { get; set; }
         [Required]
         public EnumCarStatus Status { get; set; } = EnumCarStatus.Inactive;
         [Required]
