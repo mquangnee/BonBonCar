@@ -1,11 +1,6 @@
 ﻿using BonBonCar.Domain.Enums.Vehicle;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BonBonCar.Domain.Entities
 {
@@ -38,7 +33,7 @@ namespace BonBonCar.Domain.Entities
 
         // Navigation (tuỳ chọn)
         [ForeignKey(nameof(VehicleId))]
-        public Vehicle Vehicle { get; set; } = null!;
+        public Car Vehicle { get; set; } = null!;
 
         // Nếu mỗi order chỉ có 1 contract
         public RentalContract? RentalContract { get; set; }

@@ -5,7 +5,6 @@ using BonBonCar.Domain.IRepository;
 using BonBonCar.Domain.IService;
 using BonBonCar.Domain.Models.CmdModels;
 using BonBonCar.Domain.Models.EntityModels;
-using BonBonCar.Infrastructure.Identity;
 using BonBonCar.Infrastructure.Services.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -20,14 +19,14 @@ namespace BonBonCar.Application.Commands.AuthCmd
 
     public class RegisterCmdHandler : IRequestHandler<RegisterCmd, MethodResult<RegisterStartResultModel>>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IPasswordHasher<ApplicationUser> _passwordHasher;
+        private readonly UserManager<User> _userManager;
+        private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEmailService _emailService;
         private readonly IEmailTemplate _emailTemplate;
-        private readonly IPasswordValidator<ApplicationUser> _passwordValidator;
+        private readonly IPasswordValidator<User> _passwordValidator;
 
-        public RegisterCmdHandler(UserManager<ApplicationUser> userManager, IPasswordHasher<ApplicationUser> passwordHasher, IUnitOfWork unitOfWork, IEmailService emailService, IEmailTemplate emailTemplate, IPasswordValidator<ApplicationUser> passwordValidator)
+        public RegisterCmdHandler(UserManager<User> userManager, IPasswordHasher<User> passwordHasher, IUnitOfWork unitOfWork, IEmailService emailService, IEmailTemplate emailTemplate, IPasswordValidator<User> passwordValidator)
         {
             _userManager = userManager;
             _passwordHasher = passwordHasher;
@@ -52,7 +51,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
             var otp = RandomNumberGenerator.GetInt32(3, 1_000_000).ToString("D6");
             var otpHash = TokenUtil.Sha256Token(otp);
             // Hash password
-            user = new ApplicationUser
+            user = new User
             {
                 UserName = request.Email,
                 Email = request.Email

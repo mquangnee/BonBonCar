@@ -1,7 +1,7 @@
 ﻿using BonBonCar.Application.Common;
+using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IService;
-using BonBonCar.Infrastructure.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,12 +14,12 @@ namespace BonBonCar.Application.Commands.AuthCmd
 
     public class ResetPasswordCmdHandler : IRequestHandler<ResetPasswordCmd, MethodResult<bool>>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly IOtpService _otpService;
         private readonly IEmailService _emailService;
         private readonly IEmailTemplate _emailTemplate;
 
-        public ResetPasswordCmdHandler(UserManager<ApplicationUser> userManager, IOtpService otpService, IEmailService emailService, IEmailTemplate emailTemplate)
+        public ResetPasswordCmdHandler(UserManager<User> userManager, IOtpService otpService, IEmailService emailService, IEmailTemplate emailTemplate)
         {
             _userManager = userManager;
             _otpService = otpService;

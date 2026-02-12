@@ -1,10 +1,10 @@
 ﻿using BonBonCar.Application.Common;
+using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IRepository;
 using BonBonCar.Domain.IService;
 using BonBonCar.Domain.Models.CmdModels.AuthCmdModels;
 using BonBonCar.Domain.Models.EntityModels;
-using BonBonCar.Infrastructure.Identity;
 using BonBonCar.Infrastructure.Services.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -18,12 +18,12 @@ namespace BonBonCar.Application.Commands.AuthCmd
 
     public class VerifyRegisterOtpCmdHandler : IRequestHandler<VerifyRegisterOtpCmd, MethodResult<AuthModel>>
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<User> _userManager;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly IRefreshTokenService _refreshTokenService;
 
-        public VerifyRegisterOtpCmdHandler(UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService)
+        public VerifyRegisterOtpCmdHandler(UserManager<User> userManager, IUnitOfWork unitOfWork, IJwtTokenService jwtTokenService, IRefreshTokenService refreshTokenService)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
@@ -78,7 +78,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
                 methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataAlreadyExist), nameof(session.Email));
                 return methodResult;
             }
-            user = new ApplicationUser
+            user = new User
             {
                 UserName = session.Email,
                 FullName = session.Username,

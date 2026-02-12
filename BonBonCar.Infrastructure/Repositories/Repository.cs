@@ -1,5 +1,6 @@
 ﻿using BonBonCar.Domain.IRepository;
 using BonBonCar.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace BonBonCar.Infrastructure.Repositories
 {
@@ -30,9 +31,19 @@ namespace BonBonCar.Infrastructure.Repositories
             return entity != null ? true : false;
         }
 
+        public async Task<IList<T>> GetAllAsync()
+        {
+            return await _dbContext.Set<T>().ToListAsync();
+        }
+
         public async Task<T?> GetByIdAsync(Guid id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
+        }
+
+        public IQueryable<T> QueryableAsync()
+        {
+            return _dbContext.Set<T>().AsQueryable();
         }
 
         public T Update(T updateEntity)
