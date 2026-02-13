@@ -60,52 +60,67 @@ namespace BonBonCar.Application.Commands.CarCmd
                 _unitOfWork.CarPrices.Update(price);
             }
 
-            if (request.Images != null && request.Images.Count > 0)
+            var old = await _unitOfWork.CarImages.QueryableAsync().Where(x => x.CarId == request.CarId).ToListAsync(cancellationToken);
+            var keep = (request.KeepImages ?? new List<string>()).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().ToList();
+
+            var newCount = request.Images?.Count ?? 0;
+            if (keep.Count + newCount == 0)
             {
-                var carFolderPhysical = Path.Combine(_env.WebRootPath, "images", "cars", request.CarId.ToString());
-                Directory.CreateDirectory(carFolderPhysical);
-
-                foreach (var file in Directory.GetFiles(carFolderPhysical))
-                {
-                    System.IO.File.Delete(file);
-                }
-
-                var oldImages = await _unitOfWork.CarImages.QueryableAsync().Where(x => x.CarId == request.CarId).ToListAsync(cancellationToken);
-
-                foreach (var img in oldImages)
-                {
-                    _unitOfWork.CarImages.DeleteAsync(img);
-                }
-
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.InValidFormat), "Phải có ít nhất 1 ảnh");
+                return methodResult;
             }
 
-            bool isFirstImage = true;
+            var toDelete = old.Where(x => !keep.Contains(x.ImageUrl)).ToList();
+            var carFolder = Path.Combine(_env.WebRootPath, "images", "cars", request.CarId.ToString());
 
+            foreach (var img in toDelete)
+            {
+                var fileName = Path.GetFileName(img.ImageUrl);
+                var physicalPath = Path.Combine(carFolder, fileName);
+                if (System.IO.File.Exists(physicalPath))
+                {
+                    System.IO.File.Delete(physicalPath);
+                }
+                _unitOfWork.CarImages.DeleteAsync(img);
+            }
+
+            var addedUrls = new List<string>();
             if (request.Images != null && request.Images.Count > 0)
             {
+                Directory.CreateDirectory(carFolder);
+
                 foreach (var file in request.Images)
                 {
-                    if (file.Length == 0) continue;
-                    var extension = Path.GetExtension(file.FileName);
-                    var fileName = $"{Guid.NewGuid()}{extension}";
-                    var fullPath = Path.Combine(uploadRoot, fileName);
+                    var ext = Path.GetExtension(file.FileName);
+                    var fileName = $"{Guid.NewGuid()}{ext}";
+                    var savePath = Path.Combine(carFolder, fileName);
 
-                    using var stream = new FileStream(fullPath, FileMode.Create);
+                    using var stream = new FileStream(savePath, FileMode.Create);
                     await file.CopyToAsync(stream, cancellationToken);
 
-                    var imageUrl = $"/images/cars/{car.Id}/{fileName}";
+                    var url = $"/images/cars/{request.CarId}/{fileName}";
+                    addedUrls.Add(url);
 
-                    var carImage = new CarImage
+                    await _unitOfWork.CarImages.AddAsync(new CarImage
                     {
-                        CarId = car.Id,
-                        ImageUrl = imageUrl,
-                        IsPrimary = isFirstImage
-                    };
-                    await _unitOfWork.CarImages.AddAsync(carImage);
-
-                    isFirstImage = false;
+                        CarId = request.CarId,
+                        ImageUrl = url,
+                        IsPrimary = false,
+                    });
                 }
             }
+
+            var thumbnailUrl = keep.FirstOrDefault() ?? addedUrls.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(thumbnailUrl))
+            {
+                var remain = await _unitOfWork.CarImages.QueryableAsync().Where(x => x.CarId == request.CarId).ToListAsync(cancellationToken);
+
+                foreach (var img in remain)
+                {
+                    img.IsPrimary = (img.ImageUrl == thumbnailUrl);
+                }            
+            }
+
             _unitOfWork.SaveChanges();
             methodResult.Result = true;
             methodResult.StatusCode = StatusCodes.Status200OK;

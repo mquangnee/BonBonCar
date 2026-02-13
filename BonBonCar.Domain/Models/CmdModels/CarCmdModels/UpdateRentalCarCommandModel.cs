@@ -6,6 +6,7 @@ namespace BonBonCar.Domain.Models.CmdModels.CarCmdModels
     {
         public Guid CarId { get; set; }
         public IList<string>? Features { get; set; }
+        public IList<string>? KeepImages { get; set; }
         public IList<IFormFile>? Images { get; set; }
         public string? Prices { get; set; }
     }
