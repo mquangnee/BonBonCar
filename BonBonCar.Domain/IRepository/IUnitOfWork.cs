@@ -6,8 +6,8 @@
         IRentalContractRepository RentalContracts { get; }
         IRentalOrderRepository RentalOrders { get; }
         IUserDocumentRepository UserDocuments { get; }
-        ICarImageRepository VehicleImages { get; }
-        ICarRepository Vehicles { get; }
+        ICarImageRepository CarImages { get; }
+        ICarRepository Cars { get; }
         IVerificationLogRepository VerificationLogs { get; }
         IVerificationSessionRepository VerificationSessions { get; }
         IRegisterOtpSessionRepository RegisterOtpSessions { get; }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace BonBonCar.Domain.Enums.Vehicle
+namespace BonBonCar.Domain.Enums.Car
 {
     public enum PaymentMethod
     {

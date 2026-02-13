@@ -14,12 +14,12 @@ namespace BonBonCar.Application.Commands.CarCmd
     {
     }
 
-    public class CreateVehicleCmdHandler : IRequestHandler<CreateCarCmd, MethodResult<bool>>
+    public class CreateCarCmdHandler : IRequestHandler<CreateCarCmd, MethodResult<bool>>
     {   
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CreateVehicleCmdHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
+        public CreateCarCmdHandler(IUnitOfWork unitOfWork, IHttpContextAccessor httpContextAccessor)
         {
             _unitOfWork = unitOfWork;
             _httpContextAccessor = httpContextAccessor;
@@ -44,7 +44,7 @@ namespace BonBonCar.Application.Commands.CarCmd
                 return methodResult;
             }
 
-            var carExist = await _unitOfWork.Vehicles.GetByLicensePlate(request.LicensePlate ?? string.Empty);
+            var carExist = await _unitOfWork.Cars.GetByLicensePlate(request.LicensePlate ?? string.Empty);
             if (carExist != null)
             {
                 methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataAlreadyExist), nameof(request.LicensePlate));
@@ -59,10 +59,10 @@ namespace BonBonCar.Application.Commands.CarCmd
                 ModelId = request.ModelId,
                 Year = request.Year,
                 LicensePlate =request.LicensePlate?.Trim(),
-                Location = request.Location?.Trim(),
+                PickupAddress = request.PickupAddress?.Trim(),
                 Features = request.Features
             };
-            await _unitOfWork.Vehicles.AddAsync(car);
+            await _unitOfWork.Cars.AddAsync(car);
 
             var uploadRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "cars", car.Id.ToString());
 
@@ -87,11 +87,11 @@ namespace BonBonCar.Application.Commands.CarCmd
 
                     var carImage = new CarImage
                     {
-                        VehicleId = car.Id,
+                        CarId = car.Id,
                         ImageUrl = imageUrl,
                         IsPrimary = isFirstImage
                     };
-                    await _unitOfWork.VehicleImages.AddAsync(carImage);
+                    await _unitOfWork.CarImages.AddAsync(carImage);
 
                     isFirstImage = false;
                 }

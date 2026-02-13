@@ -4,7 +4,7 @@ namespace BonBonCar.Domain.Models.EntityModels
 {
     public class BasePriceModel
     {
-        public EnumCarType VehicleType { get; set; }
+        public EnumCarType CarType { get; set; }
         public EnumRentalDuration RentalDuration { get; set; }
         public decimal BasePrice { get; set; }
     }

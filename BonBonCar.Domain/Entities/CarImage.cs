@@ -7,7 +7,7 @@ namespace BonBonCar.Domain.Entities
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
         [Required]
-        public Guid VehicleId { get; set; }
+        public Guid CarId { get; set; }
         [Required]
         [StringLength(500)]
         public string? ImageUrl { get; set; }

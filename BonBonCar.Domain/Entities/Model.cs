@@ -1,5 +1,4 @@
 ﻿using BonBonCar.Domain.Enums.Car;
-using BonBonCar.Domain.Enums.Vehicle;
 using System.ComponentModel.DataAnnotations;
 
 namespace BonBonCar.Domain.Entities

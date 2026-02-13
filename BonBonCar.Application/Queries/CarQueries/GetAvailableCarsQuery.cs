@@ -26,7 +26,7 @@ namespace BonBonCar.Application.Queries.CarQueries
         {
             ArgumentNullException.ThrowIfNull(request);
             var methodResult = new MethodResult<IList<Car>>();
-            var cars = await _unitOfWork.Vehicles.QueryableAsync().Where(c => c.Status == EnumCarStatus.Available).ToListAsync();
+            var cars = await _unitOfWork.Cars.QueryableAsync().Where(c => c.Status == EnumCarStatus.Available).ToListAsync();
             if (cars == null)
             {
                 methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist));

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BonBonCar.Infrastructure.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260211135247_InitialDB")]
-    partial class InitialDB
+    [Migration("20260212190610_UpdateCarTable")]
+    partial class UpdateCarTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,13 +34,13 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.Property<decimal>("BasePrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("CarType")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<int>("RentalDuration")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VehicleType")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -87,6 +87,9 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.Property<Guid>("ModelId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("PickupAddress")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -107,6 +110,9 @@ namespace BonBonCar.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -115,12 +121,9 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.Property<bool>("IsPrimary")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("VehicleId", "IsPrimary")
+                    b.HasIndex("CarId", "IsPrimary")
                         .IsUnique()
                         .HasFilter("[IsPrimary] = 1");
 
@@ -326,6 +329,9 @@ namespace BonBonCar.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -344,12 +350,9 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("VehicleId");
+                    b.HasIndex("CarId");
 
                     b.ToTable("RentalOrders");
                 });
@@ -717,13 +720,13 @@ namespace BonBonCar.Infrastructure.Migrations
 
             modelBuilder.Entity("BonBonCar.Domain.Entities.RentalOrder", b =>
                 {
-                    b.HasOne("BonBonCar.Domain.Entities.Car", "Vehicle")
+                    b.HasOne("BonBonCar.Domain.Entities.Car", "Car")
                         .WithMany()
-                        .HasForeignKey("VehicleId")
+                        .HasForeignKey("CarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Vehicle");
+                    b.Navigation("Car");
                 });
 
             modelBuilder.Entity("BonBonCar.Domain.Entities.VerificationLog", b =>

@@ -40,7 +40,7 @@ namespace BonBonCar.Application.Queries.CarQueries
                 return methodResult;
             }
 
-            var rentalCars = await _unitOfWork.Vehicles.QueryableAsync().Where(c => c.UserId == userId).OrderByDescending(c => c.CreatedAt).ToListAsync();
+            var rentalCars = await _unitOfWork.Cars.QueryableAsync().Where(c => c.UserId == userId).OrderByDescending(c => c.CreatedAt).ToListAsync();
             if (rentalCars == null)
             {
                 methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist));
@@ -62,20 +62,20 @@ namespace BonBonCar.Application.Queries.CarQueries
                     methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(model.BrandId));
                     return methodResult;
                 }
-                var thumbnailImage = await _unitOfWork.VehicleImages.QueryableAsync().FirstOrDefaultAsync(i => i.VehicleId == car.Id && i.IsPrimary == true);
-                var thumbnailImageUrl = thumbnailImage != null ? thumbnailImage.ImageUrl : "";
-                //if (thumbnailImage == null)
-                //{
-                //    methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist));
-                //    return methodResult;
-                //}
+                var thumbnailImage = await _unitOfWork.CarImages.QueryableAsync().FirstOrDefaultAsync(i => i.CarId == car.Id && i.IsPrimary == true);
+                if (thumbnailImage == null)
+                {
+                    methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist));
+                    return methodResult;
+                }
                 var rentalCar = new RentalCarModel
                 {
+                    CarId = car.Id,
                     BrandName = brand.Name,
                     ModelName = model.Name,
                     Year = car.Year,
                     LicensePlate = car.LicensePlate,
-                    ThumbnailUrl = thumbnailImageUrl,
+                    ThumbnailUrl = thumbnailImage.ImageUrl,
                     Status = car.Status
                 };
                 rentalCarsList.Add(rentalCar);
@@ -87,7 +87,8 @@ namespace BonBonCar.Application.Queries.CarQueries
             }
             if (!string.IsNullOrEmpty(request.Keyword))
             {
-                rentalCarsList = rentalCarsList.Where(c => c.BrandName.Contains(request.Keyword) || c.ModelName.Contains(request.Keyword) || c.LicensePlate.Contains(request.Keyword)).ToList();
+                var keyword = request.Keyword.ToLower();
+                rentalCarsList = rentalCarsList.Where(c => c.BrandName.ToLower().Contains(keyword) || c.ModelName.ToLower().Contains(keyword) || c.LicensePlate.ToLower().Contains(keyword)).ToList();
             }
             rentalCarsList = rentalCarsList
                                 .Skip((request.Page - 1) * request.PageSize)

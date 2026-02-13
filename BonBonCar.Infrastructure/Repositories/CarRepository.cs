@@ -1,6 +1,5 @@
 ﻿using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.IRepository;
-using BonBonCar.Domain.Models.EntityModels;
 using BonBonCar.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +13,12 @@ namespace BonBonCar.Infrastructure.Repositories
 
         public async Task<Car> GetByLicensePlate(string licensePlateId)
         {
-            var vehicle = await _dbContext.Cars.FirstOrDefaultAsync(v => v.LicensePlate == licensePlateId);
-            if (vehicle == null)
+            var car = await _dbContext.Cars.FirstOrDefaultAsync(v => v.LicensePlate == licensePlateId);
+            if (car == null)
             {
                 return null;
             }
-            return vehicle;
+            return car;
         }
     }
 }
