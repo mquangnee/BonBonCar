@@ -35,7 +35,7 @@ namespace BonBonCar.Infrastructure.Persistence
             //);
 
             builder.Entity<CarImage>()
-                 .HasIndex(x => new { x.VehicleId, x.IsPrimary })
+                 .HasIndex(x => new { x.CarId, x.IsPrimary })
                  .IsUnique()
                  .HasFilter("[IsPrimary] = 1");
         }

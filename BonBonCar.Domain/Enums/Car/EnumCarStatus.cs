@@ -10,9 +10,7 @@ namespace BonBonCar.Domain.Enums.Car
         Available = 1,
         [Description("Đang được thuê")]
         Rented = 2,
-        [Description("Đang bảo trì")]
-        Maintenance = 3,
         [Description("Bị vô hiệu hoá")]
-        Disabled = 4
+        Disabled = 3
     }
 }

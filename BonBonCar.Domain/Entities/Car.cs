@@ -17,11 +17,7 @@ namespace BonBonCar.Domain.Entities
         [Required]
         [StringLength(20)]
         public string? LicensePlate { get; set; }
-        /// <summary>
-        /// Car location for search/filter (e.g. city/district/address).
-        /// </summary>
-        [StringLength(10)]
-        public string? Location { get; set; }
+        public string? PickupAddress { get; set; }
         [Required]
         public IList<string>? Features { get; set; }
         [Required]

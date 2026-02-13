@@ -95,12 +95,77 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
+        /// <summary>
+        /// Lấy danh sách xe cho thuê
+        /// Route: /api/cars/get-rental-cars
+        /// Method: GET
+        /// </summary>
         [HttpGet("get-rental-cars")]
         [ProducesResponseType(typeof(MethodResult<IList<RentalCarModel>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetRentalCars([FromQuery] GetRentalCarsQuery query)
         {
             var commandResult = await _mediator.Send(query).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        /// <summary>
+        /// Chỉnh sửa trạng thái xe
+        /// Route: /api/cars/change-status
+        /// Method: PUT
+        /// </summary>
+        [HttpPut("change-status/{carId}")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> ChangeStatusCar([FromRoute] Guid carId)
+        {
+            var command = new ChangeCarStatusCommand { CarId = carId };
+            var commandResult = await _mediator.Send(command).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        /// <summary>
+        /// Gỡ bỏ xe cho thuê
+        /// Route: /api/cars/remove
+        /// Method: DELETE
+        /// </summary>
+        [HttpDelete("remove/{carId}")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> RemoveRentalCar([FromRoute] Guid carId)
+        {
+            var command = new RemoveRentalCarCommand { CarId = carId };
+            var commandResult = await _mediator.Send(command).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        /// <summary>
+        /// Lấy thông tin chi tiết xe
+        /// Route: /api/cars/get-details
+        /// Method: POST
+        /// </summary>
+        [HttpGet("details/{carId}")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetCarDetail([FromRoute] Guid carId)
+        {
+            var command = new GetRentalCarDetailQuery { CarId = carId };
+            var commandResult = await _mediator.Send(command).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin xe
+        /// Route: /api/cars/update
+        /// Method: PUT
+        /// </summary>
+        [HttpPut("update")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> UpdateRentalCar([FromForm] UpdateRentalCarCommand command)
+        {
+            var commandResult = await _mediator.Send(command).ConfigureAwait(false);
             return commandResult.GetActionResult();
         }
 

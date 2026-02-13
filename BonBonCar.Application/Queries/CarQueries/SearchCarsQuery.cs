@@ -2,7 +2,6 @@ using BonBonCar.Application.Common;
 using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.Car;
 using BonBonCar.Domain.Enums.ErrorCodes;
-using BonBonCar.Domain.Enums.Vehicle;
 using BonBonCar.Domain.IRepository;
 using BonBonCar.Domain.Models.EntityModels;
 using MediatR;
@@ -63,10 +62,10 @@ namespace BonBonCar.Application.Queries.CarQueries
                     o.Status != RentalOrderStatus.Cancelled &&
                     o.StartDate < ret &&
                     o.EndDate > pickup)
-                .Select(o => o.VehicleId)
+                .Select(o => o.CarId)
                 .Distinct();
 
-            IQueryable<Car> carsQuery = _unitOfWork.Vehicles
+            IQueryable<Car> carsQuery = _unitOfWork.Cars
                 .QueryableAsync()
                 .Where(c => c.Status == EnumCarStatus.Available)
                 .Where(c => !conflictingVehicleIdsQuery.Contains(c.Id));
@@ -74,7 +73,7 @@ namespace BonBonCar.Application.Queries.CarQueries
             if (!string.IsNullOrWhiteSpace(request.Location))
             {
                 var location = request.Location.Trim();
-                carsQuery = carsQuery.Where(c => c.Location != null && EF.Functions.Like(c.Location, $"%{location}%"));
+                carsQuery = carsQuery.Where(c => c.PickupAddress != null && EF.Functions.Like(c.PickupAddress, $"%{location}%"));
             }
 
             var cars = await carsQuery
@@ -106,9 +105,9 @@ namespace BonBonCar.Application.Queries.CarQueries
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
-            var images = await _unitOfWork.VehicleImages
+            var images = await _unitOfWork.CarImages
                 .QueryableAsync()
-                .Where(i => carIds.Contains(i.VehicleId))
+                .Where(i => carIds.Contains(i.CarId))
                 .ToListAsync(cancellationToken)
                 .ConfigureAwait(false);
 
@@ -123,7 +122,7 @@ namespace BonBonCar.Application.Queries.CarQueries
                 var model = models.FirstOrDefault(m => m.Id == car.ModelId);
                 var brand = model == null ? null : brands.FirstOrDefault(b => b.Id == model.BrandId);
 
-                var carImages = images.Where(i => i.VehicleId == car.Id).ToList();
+                var carImages = images.Where(i => i.CarId == car.Id).ToList();
                 var thumbnail = carImages.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? carImages.FirstOrDefault()?.ImageUrl;
 
                 var carPrices = prices

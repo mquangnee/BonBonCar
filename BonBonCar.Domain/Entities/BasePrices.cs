@@ -8,7 +8,7 @@ namespace BonBonCar.Domain.Entities
     {
         [Key]   
         public Guid Id { get; set; }
-        public EnumCarType VehicleType { get; set; }
+        public EnumCarType CarType { get; set; }
         public EnumRentalDuration RentalDuration { get; set; }
         [Required]
         [Column(TypeName = "decimal(18,2)")]

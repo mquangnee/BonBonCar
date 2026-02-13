@@ -1,4 +1,4 @@
-﻿using BonBonCar.Domain.Enums.Vehicle;
+﻿using BonBonCar.Domain.Enums.Car;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,7 +10,7 @@ namespace BonBonCar.Domain.Entities
         public Guid Id { get; set; } = Guid.NewGuid();
 
         [Required]
-        public Guid VehicleId { get; set; }
+        public Guid CarId { get; set; }
 
         [Required]
         public Guid RenterId { get; set; } // Identity UserId (không cần navigation tới ApplicationUser)
@@ -32,8 +32,8 @@ namespace BonBonCar.Domain.Entities
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation (tuỳ chọn)
-        [ForeignKey(nameof(VehicleId))]
-        public Car Vehicle { get; set; } = null!;
+        [ForeignKey(nameof(CarId))]
+        public Car Car { get; set; } = null!;
 
         // Nếu mỗi order chỉ có 1 contract
         public RentalContract? RentalContract { get; set; }

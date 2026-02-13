@@ -1,7 +1,6 @@
-﻿using BonBonCar.Domain.Enums.Vehicle;
+﻿using BonBonCar.Domain.Enums.Car;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
 
 namespace BonBonCar.Domain.Entities
 {

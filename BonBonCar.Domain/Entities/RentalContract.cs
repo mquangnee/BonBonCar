@@ -1,4 +1,4 @@
-﻿using BonBonCar.Domain.Enums.Vehicle;
+﻿using BonBonCar.Domain.Enums.Car;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

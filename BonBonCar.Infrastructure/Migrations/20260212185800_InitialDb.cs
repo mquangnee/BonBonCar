@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BonBonCar.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialDB : Migration
+    public partial class InitialDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -61,7 +61,7 @@ namespace BonBonCar.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VehicleType = table.Column<int>(type: "int", nullable: false),
+                    CarType = table.Column<int>(type: "int", nullable: false),
                     RentalDuration = table.Column<int>(type: "int", nullable: false),
                     BasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
@@ -89,7 +89,7 @@ namespace BonBonCar.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VehicleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     IsPrimary = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -123,6 +123,7 @@ namespace BonBonCar.Infrastructure.Migrations
                     ModelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
                     LicensePlate = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    PickupAddress = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
                     Features = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -338,7 +339,7 @@ namespace BonBonCar.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    VehicleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CarId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     RenterId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -350,8 +351,8 @@ namespace BonBonCar.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_RentalOrders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RentalOrders_Cars_VehicleId",
-                        column: x => x.VehicleId,
+                        name: "FK_RentalOrders_Cars_CarId",
+                        column: x => x.CarId,
                         principalTable: "Cars",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -467,9 +468,9 @@ namespace BonBonCar.Infrastructure.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CarImages_VehicleId_IsPrimary",
+                name: "IX_CarImages_CarId_IsPrimary",
                 table: "CarImages",
-                columns: new[] { "VehicleId", "IsPrimary" },
+                columns: new[] { "CarId", "IsPrimary" },
                 unique: true,
                 filter: "[IsPrimary] = 1");
 
@@ -490,9 +491,9 @@ namespace BonBonCar.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RentalOrders_VehicleId",
+                name: "IX_RentalOrders_CarId",
                 table: "RentalOrders",
-                column: "VehicleId");
+                column: "CarId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VerificationLogs_VerificationSessionId",

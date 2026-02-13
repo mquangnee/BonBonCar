@@ -14,7 +14,7 @@ namespace BonBonCar.Infrastructure.Repositories
 
         public async Task<IList<BasePrices>> GetBasePriceByCarTypeAsync(EnumCarType carType)
         {
-            return await _dbContext.BasePrices.Where(p => p.VehicleType == carType).ToListAsync();
+            return await _dbContext.BasePrices.Where(p => p.CarType == carType).ToListAsync();
         }
     }
 }
