@@ -1,4 +1,4 @@
-﻿using BonBonCar.Domain.Enums.Car;
+using BonBonCar.Domain.Enums.Car;
 
 namespace BonBonCar.Domain.Models.EntityModels
 {
@@ -8,6 +8,10 @@ namespace BonBonCar.Domain.Models.EntityModels
         public string? BrandName { get; set; }
         public string? ModelName { get; set; }
         public int Year { get; set; }
+        /// <summary>
+        /// Location code (e.g. HN, HCM,...).
+        /// </summary>
+        public string? Location { get; set; }
         public string? PickupAddress { get; set; }
         public string? LicensePlate { get; set; }
         public string? ThumbnailUrl { get; set; }

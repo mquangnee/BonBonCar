@@ -1,4 +1,4 @@
-﻿using BonBonCar.Domain.Enums.Car;
+using BonBonCar.Domain.Enums.Car;
 
 namespace BonBonCar.Domain.Models.EntityModels
 {
@@ -9,6 +9,7 @@ namespace BonBonCar.Domain.Models.EntityModels
         public string? Brand { get; set; }
         public string? Model { get; set; }
         public int Year { get; set; }
+        public string? Location { get; set; }
         public string? LicensePlate { get; set; }
         public decimal PricePerDay { get; set; }
         public EnumCarStatus Status { get; set; }
