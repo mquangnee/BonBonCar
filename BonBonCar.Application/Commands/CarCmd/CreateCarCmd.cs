@@ -57,6 +57,7 @@ namespace BonBonCar.Application.Commands.CarCmd
             {
                 UserId = userId,
                 ModelId = request.ModelId,
+                Location = request.Location?.Trim().ToUpperInvariant(),
                 Year = request.Year,
                 LicensePlate =request.LicensePlate?.Trim(),
                 PickupAddress = request.PickupAddress?.Trim(),

@@ -72,8 +72,14 @@ namespace BonBonCar.Application.Queries.CarQueries
 
             if (!string.IsNullOrWhiteSpace(request.Location))
             {
-                var location = request.Location.Trim();
-                carsQuery = carsQuery.Where(c => c.PickupAddress != null && EF.Functions.Like(c.PickupAddress, $"%{location}%"));
+                var locationRaw = request.Location.Trim();
+                var locationCode = locationRaw.ToUpperInvariant();
+
+                // Prefer matching the structured location code, but keep backward compatibility
+                // with free-text searches against PickupAddress.
+                carsQuery = carsQuery.Where(c =>
+                    (c.Location != null && c.Location == locationCode) ||
+                    (c.PickupAddress != null && EF.Functions.Like(c.PickupAddress, $"%{locationRaw}%")));
             }
 
             var cars = await carsQuery
@@ -140,6 +146,7 @@ namespace BonBonCar.Application.Queries.CarQueries
                     BrandName = brand?.Name,
                     ModelName = model?.Name,
                     Year = car.Year,
+                    Location = car.Location,
                     LicensePlate = car.LicensePlate,
                     ThumbnailUrl = thumbnail,
                     Features = car.Features?.ToList(),

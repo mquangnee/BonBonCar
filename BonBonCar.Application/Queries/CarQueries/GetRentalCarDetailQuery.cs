@@ -1,4 +1,4 @@
-﻿using BonBonCar.Application.Common;
+using BonBonCar.Application.Common;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IRepository;
 using BonBonCar.Domain.Models.EntityModels;
@@ -97,6 +97,7 @@ namespace BonBonCar.Application.Queries.CarQueries
                 BrandName = brand.Name,
                 ModelName = model.Name,
                 Year = car.Year,
+                Location = car.Location,
                 PickupAddress = car.PickupAddress,
                 LicensePlate = car.LicensePlate,
                 ThumbnailUrl = thumbnailImage.ImageUrl,

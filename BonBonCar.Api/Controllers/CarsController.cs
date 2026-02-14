@@ -168,19 +168,5 @@ namespace BonBonCar.Api.Controllers
             var commandResult = await _mediator.Send(command).ConfigureAwait(false);
             return commandResult.GetActionResult();
         }
-
-        /// <summary>
-        /// Search available cars by location and pickup/return datetime.
-        /// Route: /api/cars/search
-        /// Method: GET
-        /// </summary>
-        [HttpGet("search")]
-        [ProducesResponseType(typeof(MethodResult<IList<RentalCarModel>>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> SearchCars([FromQuery] SearchCarsQuery query)
-        {
-            var commandResult = await _mediator.Send(query).ConfigureAwait(false);
-            return commandResult.GetActionResult();
-        }
     }
 }
