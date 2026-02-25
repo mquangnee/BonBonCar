@@ -1,6 +1,9 @@
 ﻿using BonBonCar.Application.Commands.AuthCmd;
 using BonBonCar.Application.Common;
+using BonBonCar.Application.Queries.AuthQuery;
+using BonBonCar.Domain.Models.CmdModels.AuthCmdModels;
 using BonBonCar.Domain.Models.EntityModels;
+using BonBonCar.Domain.Models.ServiceModel.GoogleService;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,13 +23,18 @@ namespace BonBonCar.Api.Controllers
             _mediator = mediator;
         }
 
-        /// <summary>
-        /// Đăng ký người dùng mới
-        /// Route: /api/auth/register
-        /// Method: POST
-        /// </summary>
-        /// <param name="command"> Dữ liệu đăng ký người dùng: email, mật khẩu, xác nhận mật khẩu
-        /// </param>
+        // Lấy profile người dùng
+        [HttpGet("profile")]
+        [ProducesResponseType(typeof(MethodResult<UserModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetProfile()
+        {
+            var command = new GetUserProfileQuery();
+            var commandResult = await _mediator.Send(command).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        // Đăng ký
         [HttpPost("register")]
         [ProducesResponseType(typeof(MethodResult<RegisterStartResultModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -36,13 +44,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Xác thực OTP cho đăng ký người dùng mới
-        /// Route: /api/auth/register/verify-otp
-        /// Method: POST
-        /// </summary>
-        /// <param name="command">< Dữ liệu xác thực OTP: email, mã OTP
-        /// /param>
+        // Xác thực OTP cho đăng ký người dùng mới
         [HttpPost("register/verify-otp")]
         [ProducesResponseType(typeof(MethodResult<AuthModel>), (int)HttpStatusCode.Created)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -52,13 +54,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Đăng nhập người dùng
-        /// Route: /api/auth/login
-        /// Method: POST
-        /// </summary>
-        /// <param name="command"> Dữ liệu đăng nhập người dùng: email, mật khẩu
-        /// </param>
+        // Đăng nhập
         [HttpPost("login")]
         [ProducesResponseType(typeof(MethodResult<AuthModel>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -68,13 +64,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Đăng xuất người dùng
-        /// Route: /api/auth/logout
-        /// Method: POST
-        /// </summary>
-        /// <param name="command"></param> Dữ liệu đăng xuất người dùng: refresh token
-        /// <returns></returns>
+        // Đăng xuất
         [HttpPost("logout")]
         [Authorize]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
@@ -86,40 +76,86 @@ namespace BonBonCar.Api.Controllers
             {
                 return Unauthorized();
             }
-            var result = await _mediator.Send(new LogoutCmd { UserID = Guid.Parse(userId) }).ConfigureAwait(false);
-            return result.GetActionResult();
+            var commandResult = await _mediator.Send(new LogoutCmd { UserID = Guid.Parse(userId) }).ConfigureAwait(false);
+            return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Quên mật khẩu - Yêu cầu đặt lại mật khẩu
-        /// Route: /api/auth/forgot-password
-        /// Method: POST
-        /// </summary>
-        /// <param name="command"></param> Dữ liệu yêu cầu đặt lại mật khẩu: email
-        /// <returns></returns>
+        // Quên mật khẩu - Yêu cầu đặt lại mật khẩu
         [HttpPost("forgot-password")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCmd command)
         {
-            var result = await _mediator.Send(command).ConfigureAwait(false);
-            return result.GetActionResult();
+            var commandResult = await _mediator.Send(command).ConfigureAwait(false);
+            return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Đặt lại mật khẩu
-        /// Route: /api/auth/reset-password
-        /// Method: POST
-        /// </summary>
-        /// <param name="command"></param> Dữ liệu đặt lại mật khẩu: email, mã OTP, mật khẩu mới, xác nhận mật khẩu mới
-        /// <returns></returns>
+        // Đặt lại mật khẩu
         [HttpPost("reset-password")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCmd command)
         {
-            var result = await _mediator.Send(command).ConfigureAwait(false);
-            return result.GetActionResult();
+            var commandResult = await _mediator.Send(command).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        // Xác minh CCCD
+        [HttpPost("verify-cccd")]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(10 * 1024 * 1024)]
+        [ProducesResponseType(typeof(MethodResult<VerifyStepResult<CccdExtractResult>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> VerifyCccd([FromForm] VerifyCccdCmdModel form)
+        {
+            byte[] bytes;
+            using (var ms = new MemoryStream())
+            {
+                await form.FrontImage.CopyToAsync(ms);
+                bytes = ms.ToArray();
+            }
+
+            var command = new VerifyCccdCmd
+            {
+                DocumentNumber = form.DocumentNumber,
+                FullName = form.FullName,
+                DateOfBirth = form.DateOfBirth,
+                Gender = form.Gender,
+                Nationality = form.Nationality,
+                PlaceOfOrigin = form.PlaceOfOrigin,
+                PlaceOfResidence = form.PlaceOfResidence,
+                FrontImageBytes = bytes,
+                FrontImageMimeType = form.FrontImage.ContentType
+            };
+
+            var commandResult = await _mediator.Send(command);
+            return commandResult.GetActionResult();
+        }
+
+        // Xác minh BLX
+        [HttpPost("verify-blx")]
+        [Authorize]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(10 * 1024 * 1024)]
+        [ProducesResponseType(typeof(MethodResult<VerifyStepResult<BlxExtractResult>>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> VerifyBlx([FromForm] VerifyBlxCmdModel form, CancellationToken ct)
+        {
+            byte[] bytes;
+            using (var ms = new MemoryStream())
+            {
+                await form.FrontImage.CopyToAsync(ms, ct);
+                bytes = ms.ToArray();
+            }
+
+            var command = new VerifyBlxCmd
+            {
+                FrontImageBytes = bytes,
+                FrontImageMimeType = form.FrontImage.ContentType
+            };
+
+            var commandResult = await _mediator.Send(command, ct);
+            return commandResult.GetActionResult();
         }
     }
 }

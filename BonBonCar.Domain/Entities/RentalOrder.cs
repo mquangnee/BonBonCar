@@ -1,4 +1,4 @@
-﻿using BonBonCar.Domain.Enums.Car;
+﻿using BonBonCar.Domain.Enums.RentalOrder;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -13,32 +13,25 @@ namespace BonBonCar.Domain.Entities
         public Guid CarId { get; set; }
 
         [Required]
-        public Guid RenterId { get; set; } // Identity UserId (không cần navigation tới ApplicationUser)
+        public Guid CustomerId { get; set; }
 
         [Required]
-        public DateTime StartDate { get; set; }
-
+        public DateTime PickupDateTime { get; set; }
+        public decimal TotalRentalFee { get; set; }
         [Required]
-        public DateTime EndDate { get; set; }
-
-        [Required]
+        public DateTime ReturnDateTime { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public decimal TotalPrice { get; set; }
+        public decimal DepositAmount { get; set; }
 
-        [Required]
-        public RentalOrderStatus Status { get; set; } = RentalOrderStatus.Pending;
+        public EnumRentalOrderStatus Status { get; set; } = EnumRentalOrderStatus.Created;
 
-        [Required]
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        // Navigation (tuỳ chọn)
-        [ForeignKey(nameof(CarId))]
-        public Car Car { get; set; } = null!;
-
-        // Nếu mỗi order chỉ có 1 contract
-        public RentalContract? RentalContract { get; set; }
-
-        // Thường payment có thể nhiều lần (cọc, phần còn lại, hoàn tiền...)
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+        public void MarkHoldPending() => Status = EnumRentalOrderStatus.HoldPending;
+        public void MarkHeld() => Status = EnumRentalOrderStatus.Held;
+        public void MarkHoldFailed() => Status = EnumRentalOrderStatus.HoldFailed;
+        public void MarkHoldExpired() => Status = EnumRentalOrderStatus.HoldExpired;
     }
 }

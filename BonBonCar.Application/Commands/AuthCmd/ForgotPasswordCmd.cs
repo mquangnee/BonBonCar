@@ -38,7 +38,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
                 methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.Email));
                 return methodResult;
             }
-            // Generate OTP and send email
+
             var otp = Random.Shared.Next(100000, 999999).ToString();
             _otpService.SetOtp(user.Email ?? string.Empty, otp);
             var body = await _emailTemplate.GetOtpEmailBodyAsync(

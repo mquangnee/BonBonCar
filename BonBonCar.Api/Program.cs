@@ -1,15 +1,21 @@
-﻿using BonBonCar.Application.Commands.AuthCmd;
+using BonBonCar.Application.Commands.AuthCmd;
 using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.IRepository;
 using BonBonCar.Domain.IService;
+using BonBonCar.Domain.Models.ServiceModel.GoogleService;
+using BonBonCar.Domain.Models.ServiceModel.SenderService;
+using BonBonCar.Domain.Models.ServiceModel.VnpayService;
 using BonBonCar.Infrastructure.Identity;
 using BonBonCar.Infrastructure.Maps;
+using BonBonCar.Infrastructure.Payments.Vnpay;
 using BonBonCar.Infrastructure.Persistence;
 using BonBonCar.Infrastructure.Persistence.SeedData;
 using BonBonCar.Infrastructure.Repositories;
 using BonBonCar.Infrastructure.Services;
-using BonBonCar.Infrastructure.Services.Model;
+using BonBonCar.Infrastructure.Services.GoogleDocumentAI;
+using BonBonCar.Infrastructure.Services.Payments;
 using BonBonCar.Infrastructure.Services.Sender;
+using BonBonCar.Infrastructure.Services.Token;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -57,14 +63,11 @@ namespace BonBonCar.Api
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-            builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
             builder.Services.AddScoped<IRentalOrderRepository, RentalOrderRepository>();
-            builder.Services.AddScoped<IUserDocumentRepository, UserDocumentRepository>();
             builder.Services.AddScoped<ICarImageRepository, CarImageRepository>();
             builder.Services.AddScoped<ICarRepository, CarRepository>();
-            builder.Services.AddScoped<IVerificationLogRepository, VerificationLogRepository>();
-            builder.Services.AddScoped<IVerificationSessionRepository, VerificationSessionRepository>();
             builder.Services.AddScoped<IRegisterOtpSessionRepository, RegisterOtpSessionRepository>();
+            builder.Services.AddScoped<IIdentityVerificationRepository, IdentityVerificationRepository>();
 
             // Đăng ký Service
             builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
@@ -101,6 +104,10 @@ namespace BonBonCar.Api
             // Đăng ký Auto Mapper
             builder.Services.AddAutoMapper(typeof(BasePriceProfile).Assembly);
 
+            // Đăng ký DocumentAI
+            builder.Services.Configure<GoogleDocumentAiOptions>(builder.Configuration.GetSection("GoogleDocumentAi"));
+            builder.Services.AddScoped<IDocumentAiService, DocumentAiService>();
+
             // Đăng ký Authorization
             builder.Services.AddAuthorization();
 
@@ -108,28 +115,34 @@ namespace BonBonCar.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Đăng ký Vnpay
+            builder.Services.Configure<VnpayOptions>(builder.Configuration.GetSection("Vnpay"));
+            builder.Services.AddScoped<IVnpayGateway, VnpayGateway>();
+            builder.Services.AddHttpClient<IVnpayTransactionService, VnpayTransactionService>();
+
             var app = builder.Build();
 
             // Seed Data
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+
                 await SeedBasePrice.SeedAsync(db);
                 await SeedBrand.SeedAsync(db);
                 await SeedModel.SeedAsync(db);
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                await IdentitySeed.SeedRolesAsync(roleManager);
+                await SeedAdminUser.SeedAsync(db, scope.ServiceProvider);
             }
 
             using (var scope = app.Services.CreateScope())
             {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-                await IdentitySeed.SeedRolesAsync(roleManager);
+                
             }
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -147,9 +160,9 @@ namespace BonBonCar.Api
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+            app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
+
+            app.MapControllers();
 
             app.Run();
         }

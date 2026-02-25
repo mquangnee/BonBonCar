@@ -1,18 +1,12 @@
-using BonBonCar.Domain.Enums.Car;
-
 namespace BonBonCar.Domain.Models.EntityModels
 {
     public class CarModel
     {
-        public Guid Id { get; set; }
-        public Guid OwnerId { get; set; }
-        public string? Brand { get; set; }
-        public string? Model { get; set; }
-        public int Year { get; set; }
-        public string? Location { get; set; }
-        public string? LicensePlate { get; set; }
-        public decimal PricePerDay { get; set; }
-        public EnumCarStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public Guid CarId { get; set; }
+        public string CarName { get; set; } = default!;
+        public string? PickupAddress { get; set; }
+        public string? PrimaryImageUrl { get; set; }
+        public decimal Price4h { get; set; }
+        public decimal Price24h { get; set; }
     }
 }

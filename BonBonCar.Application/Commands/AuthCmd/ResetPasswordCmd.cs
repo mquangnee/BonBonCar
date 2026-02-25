@@ -42,14 +42,14 @@ namespace BonBonCar.Application.Commands.AuthCmd
                 methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.Unauthorized), nameof(request.ConfirmNewPassword));
                 return methodResult;
             }
-            // Verify OTP
+
             var cachedOtp = _otpService.GetOtp(user.Email ?? string.Empty);
             if (cachedOtp == null || cachedOtp != request.Otp)
             {
                 methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.Unauthorized), nameof(request.Otp));
                 return methodResult;
             }
-            // Reset Password
+
             await _userManager.RemovePasswordAsync(user);
             var result = await _userManager.AddPasswordAsync(user, request.NewPassword ?? string.Empty);
             if (result.Succeeded)

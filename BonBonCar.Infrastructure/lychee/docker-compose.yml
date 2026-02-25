@@ -1,0 +1,36 @@
+name: bonboncar-lychee
+
+services:
+  lychee:
+    image: ghcr.io/lycheeorg/lychee:latest
+    container_name: bonboncar_lychee
+    ports:
+      - "${LYCHEE_PORT:-8000}:8000"
+    environment:
+      APP_KEY: ${LYCHEE_APP_KEY}
+      APP_URL: ${LYCHEE_APP_URL}
+      DB_CONNECTION: mysql
+      DB_HOST: lychee_db
+      DB_PORT: 3306
+      DB_DATABASE: ${LYCHEE_DB_DATABASE}
+      DB_USERNAME: ${LYCHEE_DB_USERNAME}
+      DB_PASSWORD: ${LYCHEE_DB_PASSWORD}
+    depends_on:
+      lychee_db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  lychee_db:
+    image: mariadb:11
+    container_name: bonboncar_lychee_db
+    environment:
+      MYSQL_DATABASE: ${LYCHEE_DB_DATABASE}
+      MYSQL_USER: ${LYCHEE_DB_USERNAME}
+      MYSQL_PASSWORD: ${LYCHEE_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${LYCHEE_DB_ROOT_PASSWORD}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped

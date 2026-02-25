@@ -157,6 +157,47 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.ToTable("CarPrices");
                 });
 
+            modelBuilder.Entity("BonBonCar.Domain.Entities.IdentityVerification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("BlxVerifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("CccdDateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CccdFullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CccdNationality")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CccdPlaceOfResidence")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("CccdVerifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastRejectReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IdentityVerifications");
+                });
+
             modelBuilder.Entity("BonBonCar.Domain.Entities.Model", b =>
                 {
                     b.Property<Guid>("Id")
@@ -195,14 +236,28 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("PaidAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PaymentMethod")
+                    b.Property<int>("Provider")
                         .HasColumnType("int");
 
-                    b.Property<int>("PaymentType")
+                    b.Property<string>("ProviderResponseCode")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("ProviderTransactionNo")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int>("Purpose")
                         .HasColumnType("int");
+
+                    b.Property<string>("RawIpn")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("RentalOrderId")
                         .HasColumnType("uniqueidentifier");
@@ -210,14 +265,17 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("TransactionId")
+                    b.Property<string>("TxnRef")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RentalOrderId");
+
+                    b.HasIndex("TxnRef")
+                        .IsUnique();
 
                     b.ToTable("Payments");
                 });
@@ -318,8 +376,7 @@ namespace BonBonCar.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RentalOrderId")
-                        .IsUnique();
+                    b.HasIndex("RentalOrderId");
 
                     b.ToTable("RentalContracts");
                 });
@@ -336,24 +393,25 @@ namespace BonBonCar.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("RenterId")
+                    b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<decimal>("DepositAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("PickupDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ReturnDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalPrice")
+                    b.Property<decimal>("TotalRentalFee")
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CarId");
 
                     b.ToTable("RentalOrders");
                 });
@@ -711,23 +769,12 @@ namespace BonBonCar.Infrastructure.Migrations
             modelBuilder.Entity("BonBonCar.Domain.Entities.RentalContract", b =>
                 {
                     b.HasOne("BonBonCar.Domain.Entities.RentalOrder", "RentalOrder")
-                        .WithOne("RentalContract")
-                        .HasForeignKey("BonBonCar.Domain.Entities.RentalContract", "RentalOrderId")
+                        .WithMany()
+                        .HasForeignKey("RentalOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("RentalOrder");
-                });
-
-            modelBuilder.Entity("BonBonCar.Domain.Entities.RentalOrder", b =>
-                {
-                    b.HasOne("BonBonCar.Domain.Entities.Car", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Car");
                 });
 
             modelBuilder.Entity("BonBonCar.Domain.Entities.VerificationLog", b =>
@@ -798,8 +845,6 @@ namespace BonBonCar.Infrastructure.Migrations
             modelBuilder.Entity("BonBonCar.Domain.Entities.RentalOrder", b =>
                 {
                     b.Navigation("Payments");
-
-                    b.Navigation("RentalContract");
                 });
 
             modelBuilder.Entity("BonBonCar.Domain.Entities.VerificationSession", b =>
