@@ -5,7 +5,7 @@ using BonBonCar.Domain.IRepository;
 using BonBonCar.Domain.IService;
 using BonBonCar.Domain.Models.CmdModels;
 using BonBonCar.Domain.Models.EntityModels;
-using BonBonCar.Infrastructure.Services.Model;
+using BonBonCar.Domain.Models.ServiceModel.TokenService;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -40,17 +40,15 @@ namespace BonBonCar.Application.Commands.AuthCmd
         {
             ArgumentNullException.ThrowIfNull(request);
             var methodResult = new MethodResult<RegisterStartResultModel>();
-            // Check if email already exists    
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user != null)
             {
                 methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataAlreadyExist), nameof(request.Email));
                 return methodResult;
             }
-            // Create OTP
+
             var otp = RandomNumberGenerator.GetInt32(3, 1_000_000).ToString("D6");
             var otpHash = TokenUtil.Sha256Token(otp);
-            // Hash password
             user = new User
             {
                 UserName = request.Email,
@@ -66,14 +64,13 @@ namespace BonBonCar.Application.Commands.AuthCmd
                 return methodResult;
             }
             var passwordHash = _passwordHasher.HashPassword(user, request.Password);
-            // Create register session
             var session = new RegisterOtpSession
             {
                 Email = request.Email,
                 Username = request.UserName,
                 PasswordHash = passwordHash,
                 OtpHash = otpHash,
-                ExpiredAt = DateTime.UtcNow.AddMinutes(5),
+                ExpiredAt = DateTime.Now.AddMinutes(5),
                 FailedCount = 0,
                 IsUsed = false,
                 CreatedAt = DateTime.Now,
@@ -81,7 +78,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
             };
             await _unitOfWork.RegisterOtpSessions.AddAsync(session);
             _unitOfWork.SaveChanges();
-            // Send OTP email
+
             var body = await _emailTemplate.GetOtpEmailBodyAsync(
                 otp: otp,
                 title: "Xác thực đăng ký tài khoản BonBonCar",

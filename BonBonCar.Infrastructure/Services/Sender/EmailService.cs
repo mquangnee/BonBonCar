@@ -1,5 +1,5 @@
 ﻿using BonBonCar.Domain.IService;
-using BonBonCar.Infrastructure.Services.Model;
+using BonBonCar.Domain.Models.ServiceModel.SenderService;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System.Net;

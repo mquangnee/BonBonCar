@@ -1,4 +1,4 @@
-﻿using BonBonCar.Application.Common;
+using BonBonCar.Application.Common;
 using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.IService;
@@ -34,7 +34,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
             ArgumentNullException.ThrowIfNull(request);
             var methodResult = new MethodResult<AuthModel>();
             var user = await _userManager.FindByEmailAsync(request.Email);
-            // Check email and password
+
             if (user == null)
             {
                 methodResult.AddErrorBadRequest(nameof(EnumAuthErrorCode.InvalidCredentials), nameof(request.Email));
@@ -46,7 +46,7 @@ namespace BonBonCar.Application.Commands.AuthCmd
                 methodResult.AddErrorBadRequest(nameof(EnumAuthErrorCode.InvalidCredentials), nameof(request.Password));
                 return methodResult;
             }
-            // Generate tokens
+
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? string.Empty;
             var accessToken = _jwtTokenService.CreateAccessToken(user.Id, user.FullName, request.Email, role);
@@ -54,7 +54,8 @@ namespace BonBonCar.Application.Commands.AuthCmd
             var authModel = new AuthModel
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                RefreshToken = refreshToken,
+                Role = role
             };
             methodResult.Result = authModel;
             methodResult.StatusCode = StatusCodes.Status200OK;

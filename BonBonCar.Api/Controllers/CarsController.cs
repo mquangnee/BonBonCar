@@ -2,7 +2,7 @@ using BonBonCar.Application.Commands.CarCmd;
 using BonBonCar.Application.Common;
 using BonBonCar.Application.Queries.BasePriceQuery;
 using BonBonCar.Application.Queries.BrandQuery;
-using BonBonCar.Application.Queries.CarQueries;
+using BonBonCar.Application.Queries.CarQuery;
 using BonBonCar.Application.Queries.ModelQuery;
 using BonBonCar.Domain.Entities;
 using BonBonCar.Domain.Enums.Car;
@@ -28,6 +28,7 @@ namespace BonBonCar.Api.Controllers
 
         // Lấy danh sách xe sẵn sàng cho thuê
         [HttpGet()]
+        [AllowAnonymous]
         [ProducesResponseType(typeof(MethodResult<IList<Car>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> GetCarsAvailable()
@@ -37,11 +38,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Lấy dữ liệu các hãng xe
-        /// Route: /api/cars/get-brands
-        /// Method: GET
-        /// </summary>
+        // Lấy dữ liệu các hãng xe
         [HttpGet("get-brands")]
         [ProducesResponseType(typeof(MethodResult<IList<Brand>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -52,11 +49,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Lấy dữ liệu các model xe theo hãng xe
-        /// Route: /api/cars/get-models/{brandId}
-        /// Method: GET
-        /// </summary>
+        // Lấy dữ liệu các model xe theo hãng xe
         [HttpGet("get-models/{brandId}")]
         [ProducesResponseType(typeof(MethodResult<IList<Model>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -66,11 +59,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Lấy dữ liệu giá gốc theo loại xe
-        /// Route: /api/cars/get-baseprices/{carType}
-        /// Method: GET
-        /// </summary>
+        // Lấy dữ liệu giá gốc theo loại xe
         [HttpGet("get-baseprices/{carType}")]
         [ProducesResponseType(typeof(MethodResult<IList<BasePriceModel>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -80,11 +69,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Upload xe cho thuê
-        /// Route: /api/cars/upload-rental-car
-        /// Method: POST
-        /// </summary>
+        // Upload xe cho thuê
         [HttpPost("upload-rental-car")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
@@ -95,11 +80,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Lấy danh sách xe cho thuê
-        /// Route: /api/cars/get-rental-cars
-        /// Method: GET
-        /// </summary>
+        // Lấy danh sách xe cho thuê
         [HttpGet("get-rental-cars")]
         [ProducesResponseType(typeof(MethodResult<IList<RentalCarModel>>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -109,11 +90,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Chỉnh sửa trạng thái xe
-        /// Route: /api/cars/change-status
-        /// Method: PUT
-        /// </summary>
+        // Chỉnh sửa trạng thái xe
         [HttpPut("change-status/{carId}")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -124,11 +101,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Gỡ bỏ xe cho thuê
-        /// Route: /api/cars/remove
-        /// Method: DELETE
-        /// </summary>
+        // Gỡ bỏ xe cho thuê
         [HttpDelete("remove/{carId}")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -139,11 +112,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Lấy thông tin chi tiết xe
-        /// Route: /api/cars/get-details
-        /// Method: POST
-        /// </summary>
+        // Lấy thông tin chi tiết xe
         [HttpGet("details/{carId}")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
@@ -154,11 +123,7 @@ namespace BonBonCar.Api.Controllers
             return commandResult.GetActionResult();
         }
 
-        /// <summary>
-        /// Cập nhật thông tin xe
-        /// Route: /api/cars/update
-        /// Method: PUT
-        /// </summary>
+        // Cập nhật thông tin xe
         [HttpPut("update")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(MethodResult<bool>), (int)HttpStatusCode.OK)]
@@ -166,6 +131,34 @@ namespace BonBonCar.Api.Controllers
         public async Task<IActionResult> UpdateRentalCar([FromForm] UpdateRentalCarCommand command)
         {
             var commandResult = await _mediator.Send(command).ConfigureAwait(false);
+            return commandResult.GetActionResult();
+        }
+
+        // Lấy thông tin chi tiết xe muốn thuê
+        [HttpGet("get-car-rent-detail")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(MethodResult<CarForRentModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetCarForRent([FromQuery] Guid carId, [FromQuery] DateTime? pickupDateTime, [FromQuery] DateTime? returnDateTime, CancellationToken cancellationToken)
+        {
+            var now = DateTime.Now;
+            var pickupTime = pickupDateTime ?? now.AddHours(1);
+            var returnTime = returnDateTime ?? pickupTime.AddHours(4);
+            if (returnTime <= pickupTime)
+            {
+                return BadRequest(new   
+                {
+                    isOK = false,
+                    errorMessages = new[] { "Thời gian trả xe phải sau thời gian nhận xe" }
+                });
+            }
+            var query = new GetCarDetailForRentQuery
+            {
+                CarId = carId,
+                PickupDateTime = pickupTime,
+                ReturnDateTime = returnTime
+            };
+            var commandResult = await _mediator.Send(query, cancellationToken).ConfigureAwait(false);
             return commandResult.GetActionResult();
         }
     }

@@ -11,9 +11,6 @@ namespace BonBonCar.Domain.Entities
         public Guid UserId { get; set; }
         [Required]
         public Guid ModelId { get; set; }
-        /// <summary>
-        /// Location code of the car (e.g. HN, HCM,...).
-        /// </summary>
         [StringLength(10)]
         public string? Location { get; set; }
         [Required]
