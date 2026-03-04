@@ -5,6 +5,8 @@ namespace BonBonCar.Domain.Models.CmdModels.CarCmdModels
     public class UpdateRentalCarCommandModel
     {
         public Guid CarId { get; set; }
+        public string? Location { get; set; }
+        public string? PickupAddress { get; set; }
         public IList<string>? Features { get; set; }
         public IList<string>? KeepImages { get; set; }
         public IList<IFormFile>? Images { get; set; }

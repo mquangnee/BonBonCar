@@ -29,13 +29,13 @@ namespace BonBonCar.Application.Commands.CarCmd
             var car = await _unitOfWork.Cars.GetByIdAsync(request.CarId);
             if (car == null)
             {
-                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId));
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId), request.CarId);
                 return methodResult;
             }
 
             if (car.Status == EnumCarStatus.Rented)
             {
-                methodResult.AddErrorBadRequest("Xe đang được cho thuê", nameof(car.Status));
+                methodResult.AddErrorBadRequest(nameof(EnumCarErrorCode.CarCurrentlyRented), nameof(car.Status), car.Status);
                 return methodResult;
             }
             _unitOfWork.Cars.DeleteAsync(car);
@@ -43,7 +43,7 @@ namespace BonBonCar.Application.Commands.CarCmd
             var carImages = await _unitOfWork.CarImages.QueryableAsync().Where(i => i.CarId == request.CarId).ToListAsync();
             if (carImages == null)
             {
-                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist));
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId), request.CarId);
                 return methodResult;
             }
             foreach (var image in carImages)
@@ -54,7 +54,7 @@ namespace BonBonCar.Application.Commands.CarCmd
             var carPrices = await _unitOfWork.CarPrices.QueryableAsync().Where(i => i.CarId == request.CarId).ToListAsync();
             if (carPrices == null)
             {
-                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist));
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId), request.CarId);
                 return methodResult;
             }
             foreach (var price in carPrices)

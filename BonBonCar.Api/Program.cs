@@ -133,11 +133,8 @@ namespace BonBonCar.Api
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
                 await IdentitySeed.SeedRolesAsync(roleManager);
                 await SeedAdminUser.SeedAsync(db, scope.ServiceProvider);
-            }
-
-            using (var scope = app.Services.CreateScope())
-            {
-                
+                await SeedUsers.SeedAsync(db, scope.ServiceProvider.GetRequiredService<UserManager<User>>());
+                await SeedCars.SeedAsync(db);
             }
 
             if (!app.Environment.IsDevelopment())

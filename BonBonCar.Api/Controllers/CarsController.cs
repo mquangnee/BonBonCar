@@ -142,8 +142,8 @@ namespace BonBonCar.Api.Controllers
         public async Task<IActionResult> GetCarForRent([FromQuery] Guid carId, [FromQuery] DateTime? pickupDateTime, [FromQuery] DateTime? returnDateTime, CancellationToken cancellationToken)
         {
             var now = DateTime.Now;
-            var pickupTime = pickupDateTime ?? now.AddHours(1);
-            var returnTime = returnDateTime ?? pickupTime.AddHours(4);
+            var pickupTime = pickupDateTime ?? now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+            var returnTime = returnDateTime ?? now.AddHours(5).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
             if (returnTime <= pickupTime)
             {
                 return BadRequest(new   

@@ -34,18 +34,24 @@ namespace BonBonCar.Application.Commands.CarCmd
             var car = await _unitOfWork.Cars.GetByIdAsync(request.CarId);
             if (car == null)
             {
-                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId));
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId), request.CarId);
                 return methodResult;
             }
-            var uploadRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "cars", car.Id.ToString());
             car.Features = request.Features;
+            car.Location = request.Location;
+            car.PickupAddress = request.PickupAddress;
             _unitOfWork.Cars.Update(car);
 
             var prices = string.IsNullOrWhiteSpace(request.Prices) ? new List<CarPriceModel>() : System.Text.Json.JsonSerializer.Deserialize<List<CarPriceModel>>(request.Prices);
+            if (prices == null)
+            {
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.Prices), request.Prices);
+                return methodResult;
+            }
             var carPrices = await _unitOfWork.CarPrices.QueryableAsync().Where(p => p.CarId == request.CarId).ToListAsync();
             if (carPrices == null)
             {
-                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist));
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId), request.CarId);
                 return methodResult;
             }
             foreach (var price in carPrices)
@@ -60,30 +66,29 @@ namespace BonBonCar.Application.Commands.CarCmd
                 _unitOfWork.CarPrices.Update(price);
             }
 
-            var old = await _unitOfWork.CarImages.QueryableAsync().Where(x => x.CarId == request.CarId).ToListAsync(cancellationToken);
-            var keep = (request.KeepImages ?? new List<string>()).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().ToList();
-
-            var newCount = request.Images?.Count ?? 0;
-            if (keep.Count + newCount == 0)
+            var oldImages = await _unitOfWork.CarImages.QueryableAsync().Where(x => x.CarId == request.CarId).ToListAsync(cancellationToken);
+            var keepImages = (request.KeepImages ?? new List<string>()).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().ToList();
+            if (keepImages.Count == 0 && request.Images?.Count == 0)
             {
-                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.InValidFormat), "Phải có ít nhất 1 ảnh");
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.Required), nameof(request.KeepImages), request.KeepImages);
                 return methodResult;
             }
-
-            var toDelete = old.Where(x => !keep.Contains(x.ImageUrl)).ToList();
+            var toDelete = oldImages.Where(x => !keepImages.Contains(x.ImageUrl)).ToList();
             var carFolder = Path.Combine(_env.WebRootPath, "images", "cars", request.CarId.ToString());
-
             foreach (var img in toDelete)
             {
                 var fileName = Path.GetFileName(img.ImageUrl);
-                var physicalPath = Path.Combine(carFolder, fileName);
-                if (System.IO.File.Exists(physicalPath))
+                if (fileName == null)
                 {
-                    System.IO.File.Delete(physicalPath);
+                    continue;
+                }
+                var physicalPath = Path.Combine(carFolder, fileName);
+                if (File.Exists(physicalPath))
+                {
+                    File.Delete(physicalPath);
                 }
                 _unitOfWork.CarImages.DeleteAsync(img);
             }
-
             var addedUrls = new List<string>();
             if (request.Images != null && request.Images.Count > 0)
             {
@@ -109,16 +114,20 @@ namespace BonBonCar.Application.Commands.CarCmd
                     });
                 }
             }
-
-            var thumbnailUrl = keep.FirstOrDefault() ?? addedUrls.FirstOrDefault();
+            
+            var thumbnailUrl = keepImages.FirstOrDefault() ?? addedUrls.FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(thumbnailUrl))
             {
-                var remain = await _unitOfWork.CarImages.QueryableAsync().Where(x => x.CarId == request.CarId).ToListAsync(cancellationToken);
-
-                foreach (var img in remain)
+                var currentPrimary = await _unitOfWork.CarImages.QueryableAsync().FirstOrDefaultAsync(i => i.CarId == request.CarId && i.IsPrimary);
+                if (currentPrimary != null && currentPrimary.ImageUrl != thumbnailUrl)
                 {
-                    img.IsPrimary = (img.ImageUrl == thumbnailUrl);
-                }            
+                    currentPrimary.IsPrimary = false;
+                }
+                var thumbnailImage = await _unitOfWork.CarImages.QueryableAsync().FirstOrDefaultAsync(i => i.CarId == request.CarId && i.ImageUrl == thumbnailUrl);
+                if (thumbnailImage != null)
+                {
+                    thumbnailImage.IsPrimary = true;
+                }     
             }
 
             _unitOfWork.SaveChanges();
