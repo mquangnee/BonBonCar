@@ -33,5 +33,7 @@ namespace BonBonCar.Domain.Entities
         public void MarkHeld() => Status = EnumRentalOrderStatus.Held;
         public void MarkHoldFailed() => Status = EnumRentalOrderStatus.HoldFailed;
         public void MarkHoldExpired() => Status = EnumRentalOrderStatus.HoldExpired;
+        public void MarkPaid() => Status = EnumRentalOrderStatus.Paid;
+        public void MarkCanceled() => Status = EnumRentalOrderStatus.Canceled;
     }
 }

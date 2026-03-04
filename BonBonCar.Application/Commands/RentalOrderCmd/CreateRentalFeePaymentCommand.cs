@@ -46,33 +46,28 @@ namespace BonBonCar.Application.Commands.Rentals
                 methodResult.AddErrorBadRequest("Dữ liệu không hợp lệ!");
                 return methodResult;
             }
-
             var order = await _unitOfWork.RentalOrders.GetByIdAsync(request.RentalOrderId);
             if (order is null)
             {
                 methodResult.AddErrorBadRequest("Không tìm thấy đơn thuê!");
                 return methodResult;
             }
-
             if (order.CustomerId != request.CustomerId)
             {
                 methodResult.AddErrorBadRequest("Bạn không có quyền thanh toán đơn này!");
                 return methodResult;
             }
-
             if (order.Status != EnumRentalOrderStatus.Held)
             {
-                methodResult.AddErrorBadRequest("Chỉ được thanh toán tiền thuê khi đơn đã giữ chỗ thành công (Held).");
+                methodResult.AddErrorBadRequest("Chỉ được thanh toán tiền thuê khi đơn đã giữ chỗ thành công .");
                 return methodResult;
             }
-
             var now = DateTime.Now;
             if (now < order.PickupDateTime)
             {
                 methodResult.AddErrorBadRequest("Chỉ được thanh toán tiền thuê khi đã đến thời gian bắt đầu thuê xe.");
                 return methodResult;
             }
-
             var requiredRentalFee = order.TotalRentalFee - order.DepositAmount;
             if (requiredRentalFee < 0) requiredRentalFee = 0m;
 
@@ -88,7 +83,6 @@ namespace BonBonCar.Application.Commands.Rentals
                 methodResult.AddErrorBadRequest("Đang có giao dịch thanh toán tiền thuê chưa hoàn tất!");
                 return methodResult;
             }
-
             var paidRentalFee = await _unitOfWork.Payments.QueryableAsync()
                 .AsNoTracking()
                 .Where(p => p.RentalOrderId == order.Id
@@ -96,23 +90,19 @@ namespace BonBonCar.Application.Commands.Rentals
                             && p.Purpose == EnumPaymentPurpose.RentalFee
                             && p.Status == EnumPaymentStatus.Paid)
                 .SumAsync(p => (decimal?)p.Amount, ct) ?? 0m;
-
             var remaining = requiredRentalFee - paidRentalFee;
             if (remaining <= 0)
             {
                 methodResult.AddErrorBadRequest("Đơn đã thanh toán đủ tiền thuê!");
                 return methodResult;
             }
-
             var amountRounded = decimal.Round(remaining, 0, MidpointRounding.AwayFromZero);
             if (amountRounded <= 0)
             {
                 methodResult.AddErrorBadRequest("Số tiền còn lại không hợp lệ!");
                 return methodResult;
             }
-
             var expire = now.AddMinutes(15);
-
             var payment = new Payment
             {
                 RentalOrderId = order.Id,
@@ -125,12 +115,9 @@ namespace BonBonCar.Application.Commands.Rentals
                 Purpose = EnumPaymentPurpose.RentalFee
             };
             payment.MarkPending();
-
             await _unitOfWork.Payments.AddAsync(payment);
             _unitOfWork.SaveChanges();
-
             var orderInfo = $"Thanh toán chi phí thuê xe - ID: {order.Id}";
-
             var paymentUrl = _vnpayGateway.BuildPaymentUrl(new VnpayBuildUrlRequest(
                 txnRef: payment.TxnRef,
                 amountVnd: payment.Amount,
@@ -141,7 +128,6 @@ namespace BonBonCar.Application.Commands.Rentals
                 returnUrl: string.IsNullOrWhiteSpace(request.VnpayReturnUrl) ? _vnpayOptions.ReturnUrl : request.VnpayReturnUrl,
                 ipnUrl: _vnpayOptions.IpnUrl ?? string.Empty
             ));
-
             methodResult.Result = new CreateRentalFeePaymentResponse
             {
                 RentalOrderId = order.Id,
@@ -151,7 +137,6 @@ namespace BonBonCar.Application.Commands.Rentals
                 ExpiresAt = payment.ExpiresAt,
                 PaymentUrl = paymentUrl
             };
-
             methodResult.StatusCode = StatusCodes.Status200OK;
             return methodResult;
         }

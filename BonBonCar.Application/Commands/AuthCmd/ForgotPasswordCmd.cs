@@ -32,10 +32,15 @@ namespace BonBonCar.Application.Commands.AuthCmd
         {
             ArgumentNullException.ThrowIfNull(request);
             var methodResult = new MethodResult<bool>();
+            if (request.Email == null)
+            {
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.Required), nameof(request.Email), request.Email);
+                return methodResult;
+            }
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.Email));
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.Email), request.Email);
                 return methodResult;
             }
 

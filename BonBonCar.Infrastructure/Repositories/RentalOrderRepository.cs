@@ -18,7 +18,8 @@ namespace BonBonCar.Infrastructure.Repositories
             {
                 EnumRentalOrderStatus.Created,
                 EnumRentalOrderStatus.HoldPending,
-                EnumRentalOrderStatus.Held
+                EnumRentalOrderStatus.Held,
+                EnumRentalOrderStatus.Canceled
             };
 
             return await _dbContext.RentalOrders

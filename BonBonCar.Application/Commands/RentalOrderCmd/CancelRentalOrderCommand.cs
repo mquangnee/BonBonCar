@@ -1,4 +1,6 @@
 using BonBonCar.Application.Common;
+using BonBonCar.Domain.Enums.Car;
+using BonBonCar.Domain.Enums.ErrorCodes;
 using BonBonCar.Domain.Enums.Payment;
 using BonBonCar.Domain.Enums.RentalOrder;
 using BonBonCar.Domain.IRepository;
@@ -13,7 +15,7 @@ namespace BonBonCar.Application.Commands.Rentals
     {
         public Guid CustomerId { get; set; }
         public Guid RentalOrderId { get; set; }
-        public DateTime NowLocal { get; set; } = DateTime.Now;
+        public DateTime TimeNow { get; set; } = DateTime.Now;
     }
 
     public class CancelRentalOrderCommandHandler : IRequestHandler<CancelRentalOrderCommand, MethodResult<CancelRentalResponse>>
@@ -31,44 +33,41 @@ namespace BonBonCar.Application.Commands.Rentals
             var methodResult = new MethodResult<CancelRentalResponse>();
             if (request.CustomerId == Guid.Empty || request.RentalOrderId == Guid.Empty)
             {
-                methodResult.AddErrorBadRequest("Dữ liệu không hợp lệ!");
+                var propertyName = request.CustomerId == Guid.Empty ? request.CustomerId : request.RentalOrderId;
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.Required), nameof(propertyName), propertyName);
                 return methodResult;
             }
             var order = await _unitOfWork.RentalOrders.GetByIdAsync(request.RentalOrderId);
             if (order is null)
             {
-                methodResult.AddErrorBadRequest("Không tìm thấy đơn thuê!");
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.RentalOrderId), request.RentalOrderId);
                 return methodResult;
             }
             if (order.CustomerId != request.CustomerId)
             {
-                methodResult.AddErrorBadRequest("Bạn không có quyền hủy đơn này!");
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.Unauthorized), nameof(request.CustomerId), request.CustomerId);
                 return methodResult;
             }
-            if (order.Status == EnumRentalOrderStatus.HoldFailed || order.Status == EnumRentalOrderStatus.HoldExpired)
+            if (order.Status == EnumRentalOrderStatus.HoldFailed || order.Status == EnumRentalOrderStatus.HoldExpired || order.Status == EnumRentalOrderStatus.Paid)
             {
-                methodResult.AddErrorBadRequest("Đơn thuê không thể hủy ở trạng thái hiện tại!");
+                methodResult.AddErrorBadRequest(nameof(EnumRentalOrderErrorCode.InvalidRentalOrderStatus), nameof(order.Status), order.Status);
                 return methodResult;
             }
-
-            var hasPaidRentalFee = await _unitOfWork.Payments.QueryableAsync().AsNoTracking().AnyAsync(
-                p => p.RentalOrderId == order.Id
-                && p.Provider == EnumPaymentProvider.Vnpay
-                && p.Purpose == EnumPaymentPurpose.RentalFee
-                && p.Status == EnumPaymentStatus.Paid, cancellationToken);
-            if (hasPaidRentalFee)
+            if (request.TimeNow >= order.PickupDateTime)
             {
-                methodResult.AddErrorBadRequest("Đơn đã thanh toán tiền thuê, không thể hủy!");
+                methodResult.AddErrorBadRequest(nameof(EnumRentalOrderErrorCode.PickupTimeReached), nameof(request.TimeNow), request.TimeNow);
                 return methodResult;
             }
-            if (request.NowLocal >= order.PickupDateTime)
+            var car = await _unitOfWork.Cars.GetByIdAsync(order.CarId);
+            if (car == null)
             {
-                methodResult.AddErrorBadRequest("Đã đến giờ nhận xe, không thể hủy!");
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(order.CarId), order.CarId);
                 return methodResult;
             }
-            order.MarkHoldExpired();
+            car.Status = EnumCarStatus.Available;
+            order.MarkCanceled();
+            _unitOfWork.Cars.Update(car);
             _unitOfWork.RentalOrders.Update(order);
-
             var pendingPayments = await _unitOfWork.Payments.QueryableAsync()
                 .Where(p => p.RentalOrderId == order.Id && (p.Status == EnumPaymentStatus.Created || p.Status == EnumPaymentStatus.Pending))
                 .ToListAsync(cancellationToken);
@@ -78,7 +77,6 @@ namespace BonBonCar.Application.Commands.Rentals
                 _unitOfWork.Payments.Update(p);
             }
             _unitOfWork.SaveChanges();
-
             methodResult.Result = new CancelRentalResponse
             {
                 RentalOrderId = order.Id,

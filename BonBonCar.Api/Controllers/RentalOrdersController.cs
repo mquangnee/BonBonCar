@@ -28,9 +28,9 @@ namespace BonBonCar.Api.Controllers
 
         private Guid GetUserId()
         {
-            var s = _http.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(s, out var id)) throw new Exception("Không xác định được người dùng!");
-            return id;
+            var userIdStr = _http.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(userIdStr, out var userId)) throw new Exception("Không xác định được người dùng!");
+            return userId;
         }
 
         [HttpPost("hold")]
@@ -40,53 +40,52 @@ namespace BonBonCar.Api.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!Guid.TryParse(userId, out var customerId))
                 return Unauthorized();
-
             var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
-            // VNPay sẽ redirect trình duyệt về BE endpoint này sau khi thanh toán
             var vnpayReturnUrl = $"{Request.Scheme}://{Request.Host}/api/vnpay/return";
-
             var result = await _mediator.Send(new CreateHoldCommand { CustomerId = customerId, ClientIp = ip, VnpayReturnUrl = vnpayReturnUrl, Request = req }, ct);
             return Ok(new { isOK = true, result });
         }
 
         [HttpGet("my/active")]
         [ProducesResponseType(typeof(MethodResult<MyActiveRentalsResult>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> MyActive(CancellationToken ct)
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> MyActive(CancellationToken cancellationToken)
         {
             var userId = GetUserId();
-            var q = new GetMyActiveRentalOrdersQuery { CustomerId = userId };
-            var r = await _mediator.Send(q, ct);
-            return r.GetActionResult();
+            var query = new GetMyActiveRentalOrdersQuery { CustomerId = userId };
+            var queryResult = await _mediator.Send(query, cancellationToken);
+            return queryResult.GetActionResult();
         }
 
         [HttpPost("{rentalOrderId:guid}/cancel")]
         [ProducesResponseType(typeof(MethodResult<CancelRentalResponse>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> Cancel([FromRoute] Guid rentalOrderId, CancellationToken ct)
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> Cancel([FromRoute] Guid rentalOrderId, CancellationToken cancellationToken)
         {
             var userId = GetUserId();
-            var cmd = new CancelRentalOrderCommand
+            var command = new CancelRentalOrderCommand
             {
                 CustomerId = userId,
                 RentalOrderId = rentalOrderId,
-                NowLocal = DateTime.Now
+                TimeNow = DateTime.Now
             };
-            var r = await _mediator.Send(cmd, ct);
-            return r.GetActionResult();
+            var commandResult = await _mediator.Send(command, cancellationToken);
+            return commandResult.GetActionResult();
         }
 
         [HttpPost("{rentalOrderId:guid}/pay-rental-fee")]
         [Consumes("application/json")]
         [ProducesResponseType(typeof(MethodResult<CreateRentalFeePaymentResponse>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(VoidMethodResult), (int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> PayRentalFee(
             [FromRoute] Guid rentalOrderId,
             [FromBody] CreateRentalFeePaymentRequest body,
-            CancellationToken ct)
+            CancellationToken cancellationToken)
         {
             var userId = GetUserId();
             var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
             var vnpayReturnUrl = $"{Request.Scheme}://{Request.Host}/api/vnpay/return";
-
-            var cmd = new CreateRentalFeePaymentCommand
+            var command = new CreateRentalFeePaymentCommand
             {
                 CustomerId = userId,
                 RentalOrderId = rentalOrderId,
@@ -94,9 +93,8 @@ namespace BonBonCar.Api.Controllers
                 VnpayReturnUrl = vnpayReturnUrl,
                 Request = body ?? new CreateRentalFeePaymentRequest()
             };
-
-            var r = await _mediator.Send(cmd, ct);
-            return r.GetActionResult();
+            var commandResult = await _mediator.Send(command, cancellationToken);
+            return commandResult.GetActionResult();
         }
     }
 }

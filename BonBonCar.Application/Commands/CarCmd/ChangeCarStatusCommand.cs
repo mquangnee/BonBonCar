@@ -28,7 +28,12 @@ namespace BonBonCar.Application.Commands.CarCmd
             var car = await _unitOfWork.Cars.GetByIdAsync(request.CarId);
             if (car == null)
             {
-                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId));
+                methodResult.AddErrorBadRequest(nameof(EnumSystemErrorCode.DataNotExist), nameof(request.CarId), request.CarId);
+                return methodResult;
+            }
+            if (car.Status == EnumCarStatus.Rented)
+            {
+                methodResult.AddErrorBadRequest(nameof(EnumCarErrorCode.CarCurrentlyRentedCannotBeDisabled), nameof(car.Status), car.Status);
                 return methodResult;
             }
             car.Status = car.Status == EnumCarStatus.Inactive ? EnumCarStatus.Available : EnumCarStatus.Inactive;

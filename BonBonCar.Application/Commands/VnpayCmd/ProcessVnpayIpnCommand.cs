@@ -1,4 +1,5 @@
 ﻿using BonBonCar.Application.Common;
+using BonBonCar.Domain.Enums.Car;
 using BonBonCar.Domain.Enums.Payment;
 using BonBonCar.Domain.Enums.RentalOrder;
 using BonBonCar.Domain.IRepository;
@@ -53,6 +54,14 @@ namespace BonBonCar.Application.Commands.VnpayCmd
                 return methodResult;
             }
 
+            var car = await _unitOfWork.Cars.GetByIdAsync(payment.RentalOrder.CarId);
+            if (car == null)
+            {
+                methodResult.Result = Resp("01", "Car not found");
+                methodResult.StatusCode = StatusCodes.Status200OK;
+                return methodResult;
+            }
+
             if (payment.Status == EnumPaymentStatus.Paid)
             {
                 if (payment.RentalOrder != null && payment.RentalOrder.Status != EnumRentalOrderStatus.Held)
@@ -90,6 +99,7 @@ namespace BonBonCar.Application.Commands.VnpayCmd
                         payment.RentalOrder.MarkHeld();
                     }
                 }
+                car.Status = EnumCarStatus.Rented;
                 _unitOfWork.SaveChanges();
                 methodResult.Result = Resp("00", "Confirm Success");
                 methodResult.StatusCode = StatusCodes.Status200OK;

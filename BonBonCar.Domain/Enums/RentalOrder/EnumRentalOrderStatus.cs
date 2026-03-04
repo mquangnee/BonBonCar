@@ -5,6 +5,8 @@
         Created,
         HoldPending,
         Held,
+        Paid,
+        Canceled,
         HoldFailed,
         HoldExpired
     }
